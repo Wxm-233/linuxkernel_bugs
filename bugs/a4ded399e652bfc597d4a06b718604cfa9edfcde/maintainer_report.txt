@@ -1,0 +1,66 @@
+Cc: mark@fasheh.com, linux-kernel@vger.kernel.org
+Subject: [BUG]: ocfs2 possible lock inversion involving ip_alloc_sem and local alloc inode
+
+Hello,
+
+we hit the lockdep warning below on
+6.19.0-rc5-00042-g944aacb68baf under syzkaller-style workloads:
+
+  WARNING: possible circular locking dependency detected
+
+The reported acquisition is:
+
+  ocfs2_write_begin()
+    down_write(&OCFS2_I(inode)->ip_alloc_sem)
+    ...
+    ocfs2_reserve_local_alloc_bits()
+      inode_lock(local_alloc_inode)
+
+Lockdep reports a cycle that can be summarized as:
+
+  LOCAL_ALLOC_SYSTEM_INODE inode_lock
+    -> ip_xattr_sem
+    -> ip_alloc_sem
+    -> LOCAL_ALLOC_SYSTEM_INODE inode_lock
+
+The write-side path is visible in:
+
+  ocfs2_file_write_iter()
+    -> __generic_file_write_iter()
+    -> generic_perform_write()
+    -> ocfs2_write_begin()
+    -> ocfs2_write_begin_nolock()
+    -> ocfs2_lock_allocators()
+    -> ocfs2_reserve_clusters_with_limit()
+    -> ocfs2_reserve_local_alloc_bits()
+
+The reverse dependency appears to be built by normal OCFS2 metadata
+paths rather than a purely artificial sequence.
+
+In particular, ocfs2_try_remove_refcount_tree() takes:
+
+  down_write(&oi->ip_xattr_sem);
+  down_write(&oi->ip_alloc_sem);
+
+and ocfs2_init_acl() can take ip_xattr_sem in the create path after
+cluster reservation / transaction setup. Together with the local alloc
+system inode locking and journal/sb dependencies, this seems to form
+the lockdep cycle.
+
+So this looks more like a real lock ordering problem in OCFS2 than a
+fuzzer-only oddity. I have not confirmed a live deadlock, but the
+warning appears to reflect an inconsistent locking hierarchy across the
+write, xattr/refcount cleanup, and create/ACL paths.
+
+The full warning starts with:
+
+  syz.5.144/14770 is trying to acquire lock:
+  &ocfs2_sysfile_lock_key[LOCAL_ALLOC_SYSTEM_INODE]
+
+while already holding:
+
+  &oi->ip_alloc_sem
+
+If useful, I can follow up with the full report/log pair.
+
+Thanks.

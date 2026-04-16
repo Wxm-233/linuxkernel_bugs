@@ -1,0 +1,423 @@
+======================================================
+WARNING: possible circular locking dependency detected
+6.19.0-rc5-00042-g944aacb68baf #1 Tainted: G             L     
+------------------------------------------------------
+syz-executor/34106 is trying to acquire lock:
+ffffffff8e377fa0 (fs_reclaim){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:317 [inline]
+ffffffff8e377fa0 (fs_reclaim){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4904 [inline]
+ffffffff8e377fa0 (fs_reclaim){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:5239 [inline]
+ffffffff8e377fa0 (fs_reclaim){+.+.}-{0:0}, at: kmem_cache_alloc_lru_noprof+0x56/0x8d0 mm/slub.c:5282
+
+but task is already holding lock:
+ffff88801fe3a988 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}, at: inode_lock_nested include/linux/fs.h:1072 [inline]
+ffff88801fe3a988 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}, at: __start_dirop fs/namei.c:2873 [inline]
+ffff88801fe3a988 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}, at: start_dirop+0x4e/0xc0 fs/namei.c:2884
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #9 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}:
+       down_write_nested+0x95/0x200 kernel/locking/rwsem.c:1706
+       inode_lock_nested include/linux/fs.h:1072 [inline]
+       __start_dirop fs/namei.c:2873 [inline]
+       start_dirop+0x4e/0xc0 fs/namei.c:2884
+       simple_start_creating+0xf6/0x100 fs/libfs.c:2330
+       debugfs_start_creating.part.0+0x89/0x1c0 fs/debugfs/inode.c:394
+       debugfs_start_creating fs/debugfs/inode.c:371 [inline]
+       __debugfs_create_file+0xb7/0x540 fs/debugfs/inode.c:428
+       debugfs_create_file_full+0x41/0x60 fs/debugfs/inode.c:460
+       relay_create_buf_file kernel/relay.c:366 [inline]
+       relay_open_buf.part.0+0x7ef/0xc60 kernel/relay.c:395
+       relay_open_buf kernel/relay.c:518 [inline]
+       relay_open kernel/relay.c:519 [inline]
+       relay_open+0x680/0xaf0 kernel/relay.c:476
+       blk_trace_setup_prepare+0x39d/0x710 kernel/trace/blktrace.c:716
+       blk_trace_setup+0x196/0x3a0 kernel/trace/blktrace.c:789
+       blk_trace_ioctl+0x2bd/0x2f0 kernel/trace/blktrace.c:935
+       blkdev_ioctl+0x1f7/0x6c0 block/ioctl.c:781
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl fs/ioctl.c:583 [inline]
+       __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #8 (relay_channels_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x178/0x1dc0 kernel/locking/mutex.c:776
+       relay_prepare_cpu+0x2c/0x300 kernel/relay.c:444
+       cpuhp_invoke_callback+0x3c9/0x9d0 kernel/cpu.c:195
+       __cpuhp_invoke_callback_range+0x103/0x220 kernel/cpu.c:968
+       cpuhp_invoke_callback_range kernel/cpu.c:992 [inline]
+       cpuhp_up_callbacks kernel/cpu.c:1023 [inline]
+       _cpu_up+0x3f8/0x930 kernel/cpu.c:1685
+       cpu_up+0x1d5/0x220 kernel/cpu.c:1717
+       cpuhp_bringup_mask+0xdc/0x210 kernel/cpu.c:1783
+       cpuhp_bringup_cpus_parallel kernel/cpu.c:1873 [inline]
+       bringup_nonboot_cpus+0x174/0x1b0 kernel/cpu.c:1887
+       smp_init+0x34/0x160 kernel/smp.c:1001
+       kernel_init_freeable+0x3c5/0x8b0 init/main.c:1680
+       kernel_init+0x1e/0x2d0 init/main.c:1578
+       ret_from_fork+0x95b/0xae0 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+
+-> #7 (cpu_hotplug_lock){++++}-{0:0}:
+       percpu_down_read_internal include/linux/percpu-rwsem.h:53 [inline]
+       percpu_down_read include/linux/percpu-rwsem.h:77 [inline]
+       cpus_read_lock+0x42/0x160 kernel/cpu.c:491
+       static_key_slow_inc+0x13/0x30 kernel/jump_label.c:190
+       tcp_md5_do_add+0x298/0x430 net/ipv4/tcp_ipv4.c:1433
+       tcp_v6_parse_md5_keys+0x623/0x8c0 net/ipv6/tcp_ipv6.c:689
+       do_tcp_setsockopt+0x201a/0x2bb0 net/ipv4/tcp.c:4080
+       tcp_setsockopt+0xe6/0x110 net/ipv4/tcp.c:4166
+       do_sock_setsockopt+0xf8/0x1e0 net/socket.c:2322
+       __sys_setsockopt+0x11f/0x1a0 net/socket.c:2347
+       __do_sys_setsockopt net/socket.c:2353 [inline]
+       __se_sys_setsockopt net/socket.c:2350 [inline]
+       __x64_sys_setsockopt+0xbd/0x160 net/socket.c:2350
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #6 (sk_lock-AF_INET6){+.+.}-{0:0}:
+       lock_sock_nested+0x41/0xf0 net/core/sock.c:3780
+       lock_sock include/net/sock.h:1700 [inline]
+       inet_shutdown+0x81/0x450 net/ipv4/af_inet.c:913
+       nbd_mark_nsock_dead+0xae/0x5d0 drivers/block/nbd.c:318
+       sock_shutdown+0x17c/0x280 drivers/block/nbd.c:411
+       nbd_clear_sock drivers/block/nbd.c:1427 [inline]
+       nbd_config_put+0x1e0/0x770 drivers/block/nbd.c:1451
+       nbd_genl_connect+0x162a/0x1bc0 drivers/block/nbd.c:2248
+       genl_family_rcv_msg_doit+0x1ff/0x2f0 net/netlink/genetlink.c:1115
+       genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+       genl_rcv_msg+0x532/0x7e0 net/netlink/genetlink.c:1210
+       netlink_rcv_skb+0x147/0x430 net/netlink/af_netlink.c:2550
+       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x6e3/0xa20 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x89c/0xd80 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa34/0xbf0 net/socket.c:2592
+       ___sys_sendmsg+0x11c/0x1b0 net/socket.c:2646
+       __sys_sendmsg+0x150/0x200 net/socket.c:2678
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #5 (&nsock->tx_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x178/0x1dc0 kernel/locking/mutex.c:776
+       nbd_handle_cmd drivers/block/nbd.c:1143 [inline]
+       nbd_queue_rq+0x424/0x11b0 drivers/block/nbd.c:1207
+       blk_mq_dispatch_rq_list+0x3dd/0x1bc0 block/blk-mq.c:2138
+       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+       __blk_mq_sched_dispatch_requests+0xc74/0x1470 block/blk-mq-sched.c:307
+       blk_mq_sched_dispatch_requests+0xd7/0x1b0 block/blk-mq-sched.c:329
+       blk_mq_run_hw_queue+0x236/0x650 block/blk-mq.c:2376
+       blk_mq_dispatch_list+0x511/0x12f0 block/blk-mq.c:2939
+       blk_mq_flush_plug_list+0x130/0x5b0 block/blk-mq.c:2987
+       __blk_flush_plug+0x2d5/0x4c0 block/blk-core.c:1225
+       blk_finish_plug block/blk-core.c:1252 [inline]
+       blk_finish_plug block/blk-core.c:1249 [inline]
+       __submit_bio+0x530/0x670 block/blk-core.c:651
+       __submit_bio_noacct_mq block/blk-core.c:724 [inline]
+       submit_bio_noacct_nocheck+0x540/0xbb0 block/blk-core.c:755
+       submit_bio_noacct+0xca5/0x1f80 block/blk-core.c:879
+       submit_bh fs/buffer.c:2829 [inline]
+       block_read_full_folio+0x526/0x870 fs/buffer.c:2461
+       filemap_read_folio+0xbf/0x2a0 mm/filemap.c:2496
+       do_read_cache_folio+0x250/0x5a0 mm/filemap.c:4096
+       read_mapping_folio include/linux/pagemap.h:1017 [inline]
+       read_part_sector+0xd4/0x370 block/partitions/core.c:722
+       adfspart_check_ICS+0x88/0x8f0 block/partitions/acorn.c:360
+       check_partition block/partitions/core.c:141 [inline]
+       blk_add_partitions block/partitions/core.c:589 [inline]
+       bdev_disk_changed block/partitions/core.c:693 [inline]
+       bdev_disk_changed+0x7e9/0x1540 block/partitions/core.c:642
+       blkdev_get_whole+0x18a/0x2a0 block/bdev.c:765
+       bdev_open+0x2c7/0xe30 block/bdev.c:974
+       blkdev_open+0x350/0x500 block/fops.c:698
+       do_dentry_open+0x73c/0x1590 fs/open.c:962
+       vfs_open+0x82/0x3f0 fs/open.c:1094
+       do_open fs/namei.c:4637 [inline]
+       path_openat+0x1fc1/0x2cb0 fs/namei.c:4796
+       do_filp_open+0x1f7/0x460 fs/namei.c:4823
+       do_sys_openat2+0x106/0x250 fs/open.c:1430
+       do_sys_open fs/open.c:1436 [inline]
+       __do_sys_openat fs/open.c:1452 [inline]
+       __se_sys_openat fs/open.c:1447 [inline]
+       __x64_sys_openat+0x13f/0x1f0 fs/open.c:1447
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #4 (&cmd->lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x178/0x1dc0 kernel/locking/mutex.c:776
+       nbd_queue_rq+0xbf/0x11b0 drivers/block/nbd.c:1199
+       blk_mq_dispatch_rq_list+0x3dd/0x1bc0 block/blk-mq.c:2138
+       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+       __blk_mq_sched_dispatch_requests+0xc74/0x1470 block/blk-mq-sched.c:307
+       blk_mq_sched_dispatch_requests+0xd7/0x1b0 block/blk-mq-sched.c:329
+       blk_mq_run_hw_queue+0x236/0x650 block/blk-mq.c:2376
+       blk_mq_dispatch_list+0x511/0x12f0 block/blk-mq.c:2939
+       blk_mq_flush_plug_list+0x130/0x5b0 block/blk-mq.c:2987
+       __blk_flush_plug+0x2d5/0x4c0 block/blk-core.c:1225
+       blk_finish_plug block/blk-core.c:1252 [inline]
+       blk_finish_plug block/blk-core.c:1249 [inline]
+       __submit_bio+0x530/0x670 block/blk-core.c:651
+       __submit_bio_noacct_mq block/blk-core.c:724 [inline]
+       submit_bio_noacct_nocheck+0x540/0xbb0 block/blk-core.c:755
+       submit_bio_noacct+0xca5/0x1f80 block/blk-core.c:879
+       submit_bh fs/buffer.c:2829 [inline]
+       block_read_full_folio+0x526/0x870 fs/buffer.c:2461
+       filemap_read_folio+0xbf/0x2a0 mm/filemap.c:2496
+       do_read_cache_folio+0x250/0x5a0 mm/filemap.c:4096
+       read_mapping_folio include/linux/pagemap.h:1017 [inline]
+       read_part_sector+0xd4/0x370 block/partitions/core.c:722
+       adfspart_check_ICS+0x88/0x8f0 block/partitions/acorn.c:360
+       check_partition block/partitions/core.c:141 [inline]
+       blk_add_partitions block/partitions/core.c:589 [inline]
+       bdev_disk_changed block/partitions/core.c:693 [inline]
+       bdev_disk_changed+0x7e9/0x1540 block/partitions/core.c:642
+       blkdev_get_whole+0x18a/0x2a0 block/bdev.c:765
+       bdev_open+0x2c7/0xe30 block/bdev.c:974
+       blkdev_open+0x350/0x500 block/fops.c:698
+       do_dentry_open+0x73c/0x1590 fs/open.c:962
+       vfs_open+0x82/0x3f0 fs/open.c:1094
+       do_open fs/namei.c:4637 [inline]
+       path_openat+0x1fc1/0x2cb0 fs/namei.c:4796
+       do_filp_open+0x1f7/0x460 fs/namei.c:4823
+       do_sys_openat2+0x106/0x250 fs/open.c:1430
+       do_sys_open fs/open.c:1436 [inline]
+       __do_sys_openat fs/open.c:1452 [inline]
+       __se_sys_openat fs/open.c:1447 [inline]
+       __x64_sys_openat+0x13f/0x1f0 fs/open.c:1447
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #3 (set->srcu){.+.+}-{0:0}:
+       srcu_lock_sync include/linux/srcu.h:197 [inline]
+       __synchronize_srcu+0x8f/0x250 kernel/rcu/srcutree.c:1503
+       blk_mq_wait_quiesce_done block/blk-mq.c:284 [inline]
+       blk_mq_quiesce_queue+0x149/0x1b0 block/blk-mq.c:304
+       elevator_switch+0x17c/0x7f0 block/elevator.c:576
+       elevator_change+0x387/0x570 block/elevator.c:680
+       elevator_set_default+0x2d2/0x390 block/elevator.c:753
+       blk_register_queue+0x3a2/0x540 block/blk-sysfs.c:932
+       __add_disk+0x747/0xef0 block/genhd.c:528
+       add_disk_fwnode+0x13f/0x5f0 block/genhd.c:597
+       add_disk include/linux/blkdev.h:785 [inline]
+       nbd_dev_add+0x78f/0xbb0 drivers/block/nbd.c:1984
+       nbd_init+0x184/0x340 drivers/block/nbd.c:2692
+       do_one_initcall+0x10c/0x650 init/main.c:1378
+       do_initcall_level init/main.c:1440 [inline]
+       do_initcalls init/main.c:1456 [inline]
+       do_basic_setup init/main.c:1475 [inline]
+       kernel_init_freeable+0x5af/0x8b0 init/main.c:1688
+       kernel_init+0x1e/0x2d0 init/main.c:1578
+       ret_from_fork+0x95b/0xae0 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+
+-> #2 (&q->elevator_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x178/0x1dc0 kernel/locking/mutex.c:776
+       elevator_change+0x1f0/0x570 block/elevator.c:678
+       elevator_set_none+0x8f/0x110 block/elevator.c:768
+       blk_mq_elv_switch_none block/blk-mq.c:5083 [inline]
+       __blk_mq_update_nr_hw_queues block/blk-mq.c:5127 [inline]
+       blk_mq_update_nr_hw_queues+0x4dc/0x1180 block/blk-mq.c:5185
+       nbd_start_device+0x18a/0xd70 drivers/block/nbd.c:1489
+       nbd_genl_connect+0x1343/0x1bc0 drivers/block/nbd.c:2239
+       genl_family_rcv_msg_doit+0x1ff/0x2f0 net/netlink/genetlink.c:1115
+       genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+       genl_rcv_msg+0x532/0x7e0 net/netlink/genetlink.c:1210
+       netlink_rcv_skb+0x147/0x430 net/netlink/af_netlink.c:2550
+       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x6e3/0xa20 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x89c/0xd80 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa34/0xbf0 net/socket.c:2592
+       ___sys_sendmsg+0x11c/0x1b0 net/socket.c:2646
+       __sys_sendmsg+0x150/0x200 net/socket.c:2678
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #1 (&q->q_usage_counter(io)#50){++++}-{0:0}:
+       blk_alloc_queue+0x613/0x750 block/blk-core.c:461
+       blk_mq_alloc_queue+0x170/0x280 block/blk-mq.c:4415
+       __blk_mq_alloc_disk+0x2a/0x120 block/blk-mq.c:4462
+       nbd_dev_add+0x49a/0xbb0 drivers/block/nbd.c:1954
+       nbd_init+0x184/0x340 drivers/block/nbd.c:2692
+       do_one_initcall+0x10c/0x650 init/main.c:1378
+       do_initcall_level init/main.c:1440 [inline]
+       do_initcalls init/main.c:1456 [inline]
+       do_basic_setup init/main.c:1475 [inline]
+       kernel_init_freeable+0x5af/0x8b0 init/main.c:1688
+       kernel_init+0x1e/0x2d0 init/main.c:1578
+       ret_from_fork+0x95b/0xae0 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+
+-> #0 (fs_reclaim){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x1616/0x26c0 kernel/locking/lockdep.c:5237
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x17b/0x320 kernel/locking/lockdep.c:5825
+       __fs_reclaim_acquire mm/page_alloc.c:4301 [inline]
+       fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:4315
+       might_alloc include/linux/sched/mm.h:317 [inline]
+       slab_pre_alloc_hook mm/slub.c:4904 [inline]
+       slab_alloc_node mm/slub.c:5239 [inline]
+       kmem_cache_alloc_lru_noprof+0x56/0x8d0 mm/slub.c:5282
+       __d_alloc+0x34/0xa10 fs/dcache.c:1730
+       d_alloc+0x4a/0x1e0 fs/dcache.c:1809
+       lookup_one_qstr_excl+0x174/0x260 fs/namei.c:1751
+       __start_dirop fs/namei.c:2875 [inline]
+       start_dirop+0x5c/0xc0 fs/namei.c:2884
+       simple_start_creating+0xf6/0x100 fs/libfs.c:2330
+       debugfs_start_creating.part.0+0x89/0x1c0 fs/debugfs/inode.c:394
+       debugfs_start_creating fs/debugfs/inode.c:371 [inline]
+       debugfs_create_dir+0x6c/0x480 fs/debugfs/inode.c:572
+       nsim_dev_debugfs_init drivers/net/netdevsim/dev.c:305 [inline]
+       nsim_drv_probe+0x865/0x1500 drivers/net/netdevsim/dev.c:1683
+       call_driver_probe drivers/base/dd.c:581 [inline]
+       really_probe+0x252/0xb20 drivers/base/dd.c:659
+       __driver_probe_device+0x1df/0x470 drivers/base/dd.c:801
+       driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:831
+       __device_attach_driver+0x1db/0x340 drivers/base/dd.c:959
+       bus_for_each_drv+0x14b/0x1d0 drivers/base/bus.c:500
+       __device_attach+0x1ee/0x4f0 drivers/base/dd.c:1031
+       device_initial_probe+0xaa/0xc0 drivers/base/dd.c:1086
+       bus_probe_device+0x64/0x150 drivers/base/bus.c:574
+       device_add+0x1132/0x1930 drivers/base/core.c:3689
+       nsim_bus_dev_new drivers/net/netdevsim/bus.c:471 [inline]
+       new_device_store+0x40f/0x730 drivers/net/netdevsim/bus.c:191
+       bus_attr_store+0x74/0xb0 drivers/base/bus.c:172
+       sysfs_kf_write+0xef/0x150 fs/sysfs/file.c:142
+       kernfs_fop_write_iter+0x451/0x670 fs/kernfs/file.c:352
+       new_sync_write fs/read_write.c:593 [inline]
+       vfs_write+0xc0b/0x1170 fs/read_write.c:686
+       ksys_write+0x121/0x240 fs/read_write.c:738
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+other info that might help us debug this:
+
+Chain exists of:
+  fs_reclaim --> relay_channels_mutex --> &sb->s_type->i_mutex_key#3/1
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&sb->s_type->i_mutex_key#3/1);
+                               lock(relay_channels_mutex);
+                               lock(&sb->s_type->i_mutex_key#3/1);
+  lock(fs_reclaim);
+
+ *** DEADLOCK ***
+
+7 locks held by syz-executor/34106:
+ #0: ffff888110efc420 (sb_writers#5){.+.+}-{0:0}, at: ksys_write+0x121/0x240 fs/read_write.c:738
+ #1: ffff8881166c3488 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0x28c/0x670 fs/kernfs/file.c:343
+ #2: ffff888027678f08 (kn->active#65){.+.+}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:80 [inline]
+ #2: ffff888027678f08 (kn->active#65){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x2f6/0x670 fs/kernfs/file.c:344
+ #3: ffffffff8f4e6328 (nsim_bus_dev_list_lock){+.+.}-{4:4}, at: new_device_store+0x172/0x730 drivers/net/netdevsim/bus.c:184
+ #4: ffff888128a1a0e8 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:895 [inline]
+ #4: ffff888128a1a0e8 (&dev->mutex){....}-{4:4}, at: __device_attach+0x7d/0x4f0 drivers/base/dd.c:1006
+ #5: ffff888128a1c250 (&devlink->lock_key#10){+.+.}-{4:4}, at: nsim_drv_probe+0xd2/0x1500 drivers/net/netdevsim/dev.c:1637
+ #6: ffff88801fe3a988 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}, at: inode_lock_nested include/linux/fs.h:1072 [inline]
+ #6: ffff88801fe3a988 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}, at: __start_dirop fs/namei.c:2873 [inline]
+ #6: ffff88801fe3a988 (&sb->s_type->i_mutex_key#3/1){+.+.}-{4:4}, at: start_dirop+0x4e/0xc0 fs/namei.c:2884
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 34106 Comm: syz-executor Tainted: G             L      6.19.0-rc5-00042-g944aacb68baf #1 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1b0 lib/dump_stack.c:120
+ print_circular_bug+0x274/0x340 kernel/locking/lockdep.c:2043
+ check_noncircular+0x12d/0x150 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x1616/0x26c0 kernel/locking/lockdep.c:5237
+ lock_acquire kernel/locking/lockdep.c:5868 [inline]
+ lock_acquire+0x17b/0x320 kernel/locking/lockdep.c:5825
+ __fs_reclaim_acquire mm/page_alloc.c:4301 [inline]
+ fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:4315
+ might_alloc include/linux/sched/mm.h:317 [inline]
+ slab_pre_alloc_hook mm/slub.c:4904 [inline]
+ slab_alloc_node mm/slub.c:5239 [inline]
+ kmem_cache_alloc_lru_noprof+0x56/0x8d0 mm/slub.c:5282
+ __d_alloc+0x34/0xa10 fs/dcache.c:1730
+ d_alloc+0x4a/0x1e0 fs/dcache.c:1809
+ lookup_one_qstr_excl+0x174/0x260 fs/namei.c:1751
+ __start_dirop fs/namei.c:2875 [inline]
+ start_dirop+0x5c/0xc0 fs/namei.c:2884
+ simple_start_creating+0xf6/0x100 fs/libfs.c:2330
+ debugfs_start_creating.part.0+0x89/0x1c0 fs/debugfs/inode.c:394
+ debugfs_start_creating fs/debugfs/inode.c:371 [inline]
+ debugfs_create_dir+0x6c/0x480 fs/debugfs/inode.c:572
+ nsim_dev_debugfs_init drivers/net/netdevsim/dev.c:305 [inline]
+ nsim_drv_probe+0x865/0x1500 drivers/net/netdevsim/dev.c:1683
+ call_driver_probe drivers/base/dd.c:581 [inline]
+ really_probe+0x252/0xb20 drivers/base/dd.c:659
+ __driver_probe_device+0x1df/0x470 drivers/base/dd.c:801
+ driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:831
+ __device_attach_driver+0x1db/0x340 drivers/base/dd.c:959
+ bus_for_each_drv+0x14b/0x1d0 drivers/base/bus.c:500
+ __device_attach+0x1ee/0x4f0 drivers/base/dd.c:1031
+ device_initial_probe+0xaa/0xc0 drivers/base/dd.c:1086
+ bus_probe_device+0x64/0x150 drivers/base/bus.c:574
+ device_add+0x1132/0x1930 drivers/base/core.c:3689
+ nsim_bus_dev_new drivers/net/netdevsim/bus.c:471 [inline]
+ new_device_store+0x40f/0x730 drivers/net/netdevsim/bus.c:191
+ bus_attr_store+0x74/0xb0 drivers/base/bus.c:172
+ sysfs_kf_write+0xef/0x150 fs/sysfs/file.c:142
+ kernfs_fop_write_iter+0x451/0x670 fs/kernfs/file.c:352
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0xc0b/0x1170 fs/read_write.c:686
+ ksys_write+0x121/0x240 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x72/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7f8609bacbdf
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 69 0d 03 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 ac 0d 03 00 48
+RSP: 002b:00007fff9c702890 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f8609bacbdf
+RDX: 0000000000000003 RSI: 00007fff9c7028e0 RDI: 0000000000000005
+RBP: 0000000000000005 R08: 0000000000000000 R09: 00007fff9c702830
+R10: 0000000000000000 R11: 0000000000000293 R12: 00007f8609c49265
+R13: 00007fff9c7028e0 R14: 0000000000000000 R15: 00007fff9c7034c0
+ </TASK>
+netdevsim netdevsim9 netdevsim0: renamed from eth0
+netdevsim netdevsim9 netdevsim1: renamed from eth1
+netdevsim netdevsim9 netdevsim2: renamed from eth2
+netdevsim netdevsim9 netdevsim3: renamed from eth3
+8021q: adding VLAN 0 to HW filter on device bond0
+8021q: adding VLAN 0 to HW filter on device team0
+8021q: adding VLAN 0 to HW filter on device batadv0
+veth0_vlan: entered promiscuous mode
+veth1_vlan: entered promiscuous mode
+veth0_macvtap: entered promiscuous mode
+veth1_macvtap: entered promiscuous mode
+batman_adv: batadv0: Interface activated: batadv_slave_0
+batman_adv: batadv0: Interface activated: batadv_slave_1
+ieee80211 phy33: Selected rate control algorithm 'minstrel_ht'
+ieee80211 phy34: Selected rate control algorithm 'minstrel_ht'

@@ -1,0 +1,51 @@
+------------[ cut here ]------------
+BTRFS: Transaction aborted (error -28)
+WARNING: fs/btrfs/block-group.c:4106 at do_chunk_alloc fs/btrfs/block-group.c:4106 [inline], CPU#1: kworker/u18:4/103
+WARNING: fs/btrfs/block-group.c:4106 at btrfs_chunk_alloc+0xcd5/0x1a90 fs/btrfs/block-group.c:4347, CPU#1: kworker/u18:4/103
+Modules linked in:
+CPU: 1 UID: 0 PID: 103 Comm: kworker/u18:4 Not tainted 7.0.0-rc1-00286-gaed968f8a6cd #2 PREEMPT(full) 
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: events_unbound btrfs_async_reclaim_metadata_space
+RIP: 0010:do_chunk_alloc fs/btrfs/block-group.c:4106 [inline]
+RIP: 0010:btrfs_chunk_alloc+0xcd9/0x1a90 fs/btrfs/block-group.c:4347
+Code: aa fd 41 8d 46 1e 83 f8 19 77 0f ba 01 00 04 02 48 0f a3 c2 0f 82 b7 06 00 00 e8 92 b6 aa fd 48 8d 3d 9b e0 7e 0c 8b 74 24 08 <67> 48 0f b9 3a 41 b8 01 00 00 00 44 89 44 24 18 e8 72 b6 aa fd 44
+RSP: 0018:ffffc90001f3f9e0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff88812722a000 RCX: ffffffff8416c681
+RDX: ffff888102fb2540 RSI: 00000000ffffffe4 RDI: ffffffff9095a740
+RBP: ffff88812722a0b1 R08: 0000000000000000 R09: ffffed102081c38e
+R10: ffffffffffffffe4 R11: ffffffff812ed2fa R12: ffff8881040e0980
+R13: ffff88812d9e6800 R14: ffffffffffffffe4 R15: ffff88812722a020
+FS:  0000000000000000(0000) GS:ffff8881a22c9000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f342a601000 CR3: 000000003461a000 CR4: 0000000000752ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ flush_space+0x951/0xe60 fs/btrfs/space-info.c:896
+ do_async_reclaim_metadata_space+0x172/0x3e0 fs/btrfs/space-info.c:1187
+ btrfs_async_reclaim_metadata_space+0xc8/0x130 fs/btrfs/space-info.c:1254
+ process_one_work+0x990/0x1bd0 kernel/workqueue.c:3275
+ process_scheduled_works kernel/workqueue.c:3358 [inline]
+ worker_thread+0x67e/0xe90 kernel/workqueue.c:3439
+ kthread+0x403/0x530 kernel/kthread.c:467
+ ret_from_fork+0xb27/0xdd0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	aa                   	stos   %al,%es:(%rdi)
+   1:	fd                   	std
+   2:	41 8d 46 1e          	lea    0x1e(%r14),%eax
+   6:	83 f8 19             	cmp    $0x19,%eax
+   9:	77 0f                	ja     0x1a
+   b:	ba 01 00 04 02       	mov    $0x2040001,%edx
+  10:	48 0f a3 c2          	bt     %rax,%rdx
+  14:	0f 82 b7 06 00 00    	jb     0x6d1
+  1a:	e8 92 b6 aa fd       	call   0xfdaab6b1
+  1f:	48 8d 3d 9b e0 7e 0c 	lea    0xc7ee09b(%rip),%rdi        # 0xc7ee0c1
+  26:	8b 74 24 08          	mov    0x8(%rsp),%esi
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	41 b8 01 00 00 00    	mov    $0x1,%r8d
+  35:	44 89 44 24 18       	mov    %r8d,0x18(%rsp)
+  3a:	e8 72 b6 aa fd       	call   0xfdaab6b1
+  3f:	44                   	rex.R

@@ -1,0 +1,333 @@
+failed to run ["ssh" "-p" "18304" "-F" "/dev/null" "-o" "UserKnownHostsFile=/dev/null" "-o" "IdentitiesOnly=yes" "-o" "BatchMode=yes" "-o" "StrictHostKeyChecking=no" "-o" "ConnectTimeout=10" "-i" "/home/jiakai/vini/image-repo/images-66/bullseye.id_rsa" "root@localhost" "pwd"]: exit status 255
+Connection timed out during banner exchange
+Connection to 127.0.0.1 port 18304 timed out
+[    0.000000][    T0] Linux version 7.0.0-rc7 (jiakai@userid-07) (gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #7 SMP PREEMPT_DYNAMIC Fri Apr 10 16:36:41 CST 2026
+[    0.000000][    T0] Command line: root=/dev/sda console=ttyS0 
+[    0.000000][    T0] KERNEL supported cpus:
+[    0.000000][    T0]   Intel GenuineIntel
+[    0.000000][    T0]   AMD AuthenticAMD
+[    0.000000][    T0] BIOS-provided physical RAM map:
+[    0.000000][    T0] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff]  System RAM
+[    0.000000][    T0] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff]  device reserved
+[    0.000000][    T0] BIOS-e820: [gap 0x00000000000a0000-0x00000000000effff]
+[    0.000000][    T0] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff]  device reserved
+[    0.000000][    T0] BIOS-e820: [mem 0x0000000000100000-0x00000000bffdffff]  System RAM
+[    0.000000][    T0] BIOS-e820: [mem 0x00000000bffe0000-0x00000000bfffffff]  device reserved
+[    0.000000][    T0] BIOS-e820: [gap 0x00000000c0000000-0x00000000feffbfff]
+[    0.000000][    T0] BIOS-e820: [mem 0x00000000feffc000-0x00000000feffffff]  device reserved
+[    0.000000][    T0] BIOS-e820: [gap 0x00000000ff000000-0x00000000fffbffff]
+[    0.000000][    T0] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff]  device reserved
+[    0.000000][    T0] BIOS-e820: [mem 0x0000000100000000-0x000000013fffffff]  System RAM
+[    0.000000][    T0] printk: legacy bootconsole [earlyser0] enabled
+[    0.000000][    T0] ERROR: earlyprintk= earlyser already used
+[    0.000000][    T0] ERROR: earlyprintk= earlyser already used
+[    0.000000][    T0] Hash pointers mode set to never.
+[    0.000000][    T0] Malformed early option 'vsyscall'
+[    0.000000][    T0] nopcid: PCID feature disabled
+[    0.000000][    T0] NX (Execute Disable) protection: active
+[    0.000000][    T0] APIC: Static calls initialized
+[    0.000000][    T0] SMBIOS 2.8 present.
+[    0.000000][    T0] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+[    0.000000][    T0] DMI: Memory slots populated: 1/1
+[    0.000000][    T0] Hypervisor detected: KVM
+[    0.000000][    T0] last_pfn = 0xbffe0 max_arch_pfn = 0x400000000
+[    0.000000][    T0] kvm-clock: Using msrs 4b564d01 and 4b564d00
+[    0.000004][    T0] kvm-clock: using sched offset of 2192926870 cycles
+[    0.003651][    T0] clocksource: kvm-clock: mask: 0xffffffffffffffff max_cycles: 0x1cd42e4dffb, max_idle_ns: 881590591483 ns
+[    0.014857][    T0] tsc: Detected 2294.608 MHz processor
+[    0.028751][    T0] last_pfn = 0x140000 max_arch_pfn = 0x400000000
+[    0.032780][    T0] MTRR map: 4 entries (3 fixed + 1 variable; max 19), built from 8 variable MTRRs
+[    0.038670][    T0] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.043903][    T0] last_pfn = 0xbffe0 max_arch_pfn = 0x400000000
+[    0.059081][    T0] found SMP MP-table at [mem 0x000f5b90-0x000f5b9f]
+[    0.063236][    T0] Using GB pages for direct mapping
+[    0.070419][    T0] ACPI: Early table checksum verification disabled
+[    0.074353][    T0] ACPI: RSDP 0x00000000000F59B0 000014 (v00 BOCHS )
+[    0.078418][    T0] ACPI: RSDT 0x00000000BFFE1A23 000034 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.084032][    T0] ACPI: FACP 0x00000000BFFE18BF 000074 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.089652][    T0] ACPI: DSDT 0x00000000BFFE0040 00187F (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.095293][    T0] ACPI: FACS 0x00000000BFFE0000 000040
+[    0.098533][    T0] ACPI: APIC 0x00000000BFFE1933 000090 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.104234][    T0] ACPI: HPET 0x00000000BFFE19C3 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.109876][    T0] ACPI: WAET 0x00000000BFFE19FB 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.115483][    T0] ACPI: Reserving FACP table memory at [mem 0xbffe18bf-0xbffe1932]
+[    0.120041][    T0] ACPI: Reserving DSDT table memory at [mem 0xbffe0040-0xbffe18be]
+[    0.124726][    T0] ACPI: Reserving FACS table memory at [mem 0xbffe0000-0xbffe003f]
+[    0.129429][    T0] ACPI: Reserving APIC table memory at [mem 0xbffe1933-0xbffe19c2]
+[    0.133925][    T0] ACPI: Reserving HPET table memory at [mem 0xbffe19c3-0xbffe19fa]
+[    0.138606][    T0] ACPI: Reserving WAET table memory at [mem 0xbffe19fb-0xbffe1a22]
+[    0.145217][    T0] No NUMA configuration found
+[    0.147989][    T0] Faking a node at [mem 0x0000000000000000-0x000000013fffffff]
+[    0.152501][    T0] Faking node 0 at [mem 0x0000000000001000-0x0000000080000fff] (2048MB)
+[    0.157987][    T0] Faking node 1 at [mem 0x0000000080001000-0x000000013fffffff] (3071MB)
+[    0.163789][    T0] NODE_DATA(0) allocated [mem 0x7fffb400-0x80000fff]
+[    0.169161][    T0] NODE_DATA(1) allocated [mem 0x13fff7400-0x13fffcfff]
+[    0.403551][    T0] KernelAddressSanitizer initialized (generic)
+[    0.408777][    T0] ACPI: PM-Timer IO Port: 0x608
+[    0.411411][    T0] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.415418][    T0] IOAPIC[0]: apic_id 0, version 17, address 0xfec00000, GSI 0-23
+[    0.420026][    T0] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.424206][    T0] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.428429][    T0] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.432629][    T0] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.437046][    T0] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.441346][    T0] ACPI: Using ACPI (MADT) for SMP configuration information
+[    0.445516][    T0] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+[    0.448892][    T0] TSC deadline timer available
+[    0.451742][    T0] CPU topo: Max. logical packages:   1
+[    0.455158][    T0] CPU topo: Max. logical nodes:      1
+[    0.458466][    T0] CPU topo: Num. nodes per package:  1
+[    0.461588][    T0] CPU topo: Max. logical dies:       1
+[    0.464847][    T0] CPU topo: Max. dies per package:   1
+[    0.468117][    T0] CPU topo: Max. threads per core:   1
+[    0.471377][    T0] CPU topo: Num. cores per package:     4
+[    0.474757][    T0] CPU topo: Num. threads per package:   4
+[    0.478186][    T0] CPU topo: Allowing 4 present CPUs plus 0 hotplug CPUs
+[    0.482371][    T0] kvm-guest: APIC: eoi() replaced with kvm_guest_apic_eoi_write()
+[    0.487035][    T0] kvm-guest: KVM setup pv remote TLB flush
+[    0.490480][    T0] kvm-guest: setup PV sched yield
+[    0.493549][    T0] PM: hibernation: Registered nosave memory: [mem 0x00000000-0x00000fff]
+[    0.498855][    T0] PM: hibernation: Registered nosave memory: [mem 0x0009f000-0x000fffff]
+[    0.503834][    T0] PM: hibernation: Registered nosave memory: [mem 0xbffe0000-0xffffffff]
+[    0.508879][    T0] [gap 0xc0000000-0xfeffbfff] available for PCI devices
+[    0.512937][    T0] Booting paravirtualized kernel on KVM
+[    0.516176][    T0] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.602765][    T0] Section 12 and 15 (node 0) have a circular dependency on usemap and pgdat allocations
+[    0.621088][    T0] Zone ranges:
+[    0.623225][    T0]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.627403][    T0]   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+[    0.631595][    T0]   Normal   [mem 0x0000000100000000-0x000000013fffffff]
+[    0.635810][    T0]   Device   empty
+[    0.637902][    T0] Movable zone start for each node
+[    0.640787][    T0] Early memory node ranges
+[    0.643320][    T0]   node   0: [mem 0x0000000000001000-0x000000000009efff]
+[    0.647557][    T0]   node   0: [mem 0x0000000000100000-0x0000000080000fff]
+[    0.651779][    T0]   node   1: [mem 0x0000000080001000-0x00000000bffdffff]
+[    0.656015][    T0]   node   1: [mem 0x0000000100000000-0x000000013fffffff]
+[    0.660102][    T0] Initmem setup node 0 [mem 0x0000000000001000-0x0000000080000fff]
+[    0.664673][    T0] Initmem setup node 1 [mem 0x0000000080001000-0x000000013fffffff]
+[    0.669419][    T0] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.673625][    T0] On node 0, zone DMA: 97 pages in unavailable ranges
+[    0.729733][    T0] On node 1, zone Normal: 32 pages in unavailable ranges
+[    0.734040][    T0] setup_percpu: NR_CPUS:8 nr_cpumask_bits:4 nr_cpu_ids:4 nr_node_ids:2
+[    0.740583][    T0] percpu: Embedded 71 pages/cpu s251528 r8192 d31096 u1048576
+[    0.745181][    T0] kvm-guest: PV spinlocks enabled
+[    0.748404][    T0] PV qspinlock hash table entries: 256 (order: 0, 4096 bytes, linear)
+[    0.753480][    T0] Kernel command line: earlyprintk=serial net.ifnames=0 sysctl.kernel.hung_task_all_cpu_backtrace=1 ima_policy=tcb nf-conntrack-ftp.ports=20000 nf-conntrack-tftp.ports=20000 nf-conntrack-sip.ports=20000 nf-conntrack-irc.ports=20000 nf-conntrack-sane.ports=20000 binder.debug_mask=0 rcupdate.rcu_expedited=1 rcupdate.rcu_cpu_stall_cputime=1 no_hash_pointers page_owner=on sysctl.vm.nr_hugepages=4 sysctl.vm.nr_overcommit_hugepages=4 secretmem.enable=1 sysctl.max_rcu_stall_to_panic=1 msr.allow_writes=off coredump_filter=0xffff root=/dev/sda console=ttyS0 vsyscall=native numa=fake=2 kvm-intel.nested=1 spec_store_bypass_disable=prctl nopcid vivid.n_devs=64 vivid.multiplanar=1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2 netrom.nr_ndevs=32 rose.rose_ndevs=32 smp.csd_lock_timeout=100000 watchdog_thresh=55 workqueue.watchdog_thresh=140 sysctl.net.core.netdev_unregister_timeout_secs=140 dummy_hcd.num=32 max_loop=32 nbds_max=32 \
+[    0.808377][    T0] Kernel command line: comedi.comedi_num_legacy_minors=4 panic_on_warn=1 root=/dev/sda console=ttyS0 
+[    0.819938][    T0] Unknown kernel command line parameters "nbds_max=32", will be passed to user space.
+[    0.825770][    T0] random: crng init done
+[    0.828288][    T0] printk: log buffer data + meta data: 262144 + 917504 = 1179648 bytes
+[    0.833568][    T0] software IO TLB: area num 4.
+[    0.876128][    T0] Fallback order for Node 0: 0 1 
+[    0.876150][    T0] Fallback order for Node 1: 1 0 
+[    0.876164][    T0] Built 2 zonelists, mobility grouping on.  Total pages: 1048446
+[    0.886586][    T0] Policy zone: Normal
+[    0.889961][    T0] mem auto-init: stack:off, heap alloc:on, heap free:off
+[    0.894014][    T0] stackdepot: allocating hash table via alloc_large_system_hash
+[    0.898532][    T0] stackdepot hash table entries: 1048576 (order: 12, 16777216 bytes, linear)
+[    0.910305][    T0] stackdepot: allocating space for 8192 stack pools via memblock
+[    1.165571][    T0] **********************************************************
+[    1.169874][    T0] **   NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE   **
+[    1.174291][    T0] **                                                      **
+[    1.178713][    T0] ** This system shows unhashed kernel memory addresses   **
+[    1.183069][    T0] ** via the console, logs, and other interfaces. This    **
+[    1.187343][    T0] ** might reduce the security of your system.            **
+[    1.191637][    T0] **                                                      **
+[    1.195967][    T0] ** If you see this message and you are not debugging    **
+[    1.200288][    T0] ** the kernel, report this immediately to your system   **
+[    1.204565][    T0] ** administrator!                                       **
+[    1.208931][    T0] **                                                      **
+[    1.213308][    T0] ** Use hash_pointers=always to force this mode off      **
+[    1.217593][    T0] **                                                      **
+[    1.221942][    T0] **   NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE   **
+[    1.226247][    T0] **********************************************************
+[    1.233482][    T0] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=2
+[    1.309560][    T0] allocated 83886080 bytes of page_ext
+[    1.312403][    T0] Node 0, zone      DMA: page owner found early allocated 0 pages
+[    1.335365][    T0] Node 0, zone    DMA32: page owner found early allocated 11036 pages
+[    1.340587][    T0] Node 1, zone    DMA32: page owner found early allocated 0 pages
+[    1.353028][    T0] Node 1, zone   Normal: page owner found early allocated 9607 pages
+[    1.360546][    T0] Dynamic Preempt: full
+[    1.366429][    T0] Running RCU self tests
+[    1.368620][    T0] Running RCU synchronous self tests
+[    1.371304][    T0] rcu: Preemptible hierarchical RCU implementation.
+[    1.374675][    T0] rcu: 	RCU lockdep checking is enabled.
+[    1.377886][    T0] rcu: 	RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=4.
+[    1.381690][    T0] rcu: 	RCU callback double-/use-after-free debug is enabled.
+[    1.385836][    T0] rcu: 	RCU debug extended QS entry/exit.
+[    1.388771][    T0] 	All grace periods are expedited (rcu_expedited).
+[    1.392326][    T0] 	Trampoline variant of Tasks RCU enabled.
+[    1.395444][    T0] 	Tracing variant of Tasks RCU enabled.
+[    1.398453][    T0] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+[    1.403184][    T0] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+[    1.407645][    T0] Running RCU synchronous self tests
+[    1.410360][    T0] RCU Tasks: Setting shift to 2 and lim to 1 rcu_task_cb_adjust=1 rcu_task_cpu_ids=4.
+[    1.723315][    T0] NR_IRQS: 4352, nr_irqs: 456, preallocated irqs: 16
+[    1.729831][    T0] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    1.735226][    T0] kfence: initialized - using 2097152 bytes for 255 objects at 0xffff888135c00000-0xffff888135e00000
+[    1.778086][    T0] Console: colour VGA+ 80x25
+[    1.781257][    T0] printk: legacy console [ttyS0] enabled
+[    1.781257][    T0] printk: legacy console [ttyS0] enabled
+[    1.788310][    T0] printk: legacy bootconsole [earlyser0] disabled
+[    1.788310][    T0] printk: legacy bootconsole [earlyser0] disabled
+[    1.796666][    T0] Lock dependency validator: Copyright (c) 2006 Red Hat, Inc., Ingo Molnar
+[    1.801807][    T0] ... MAX_LOCKDEP_SUBCLASSES:  8
+[    1.804903][    T0] ... MAX_LOCK_DEPTH:          48
+[    1.808213][    T0] ... MAX_LOCKDEP_KEYS:        8192
+[    1.811551][    T0] ... CLASSHASH_SIZE:          4096
+[    1.814916][    T0] ... MAX_LOCKDEP_ENTRIES:     1048576
+[    1.818318][    T0] ... MAX_LOCKDEP_CHAINS:      1048576
+[    1.821858][    T0] ... CHAINHASH_SIZE:          524288
+[    1.825076][    T0]  memory used by lock dependency info: 106625 kB
+[    1.829012][    T0]  memory used for stack traces: 8320 kB
+[    1.832483][    T0]  per task-struct memory footprint: 1920 bytes
+[    1.836953][    T0] mempolicy: Enabling automatic NUMA balancing. Configure with numa_balancing= or the kernel.numa_balancing sysctl
+[    1.844851][    T0] ACPI: Core revision 20251212
+[    1.850896][    T0] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+[    1.857941][    T0] APIC: Switch to symmetric I/O mode setup
+[    1.863257][    T0] x2apic enabled
+[    1.868066][    T0] APIC: Switched APIC routing to: physical x2apic
+[    1.871892][    T0] kvm-guest: APIC: send_IPI_mask() replaced with kvm_send_ipi_mask()
+[    1.877091][    T0] kvm-guest: APIC: send_IPI_mask_allbutself() replaced with kvm_send_ipi_mask_allbutself()
+[    1.883290][    T0] kvm-guest: setup PV IPIs
+[    1.894039][    T0] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    1.899063][    T0] clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x21134f58f0d, max_idle_ns: 440795217993 ns
+[    1.906584][    T0] Calibrating delay loop (skipped) preset value.. 4589.21 BogoMIPS (lpj=22946080)
+[    1.917441][    T0] x86/cpu: User Mode Instruction Prevention (UMIP) activated
+[    1.927254][    T0] Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+[    1.930992][    T0] Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+[    1.935137][    T0] mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+[    1.936617][    T0] Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+[    1.946594][    T0] Spectre V2 : Mitigation: Enhanced / Automatic IBRS
+[    1.950809][    T0] RETBleed: Mitigation: Enhanced IBRS
+[    1.956594][    T0] ITS: Mitigation: Aligned branch/return thunks
+[    1.960411][    T0] TAA: Mitigation: Clear CPU buffers
+[    1.963696][    T0] MMIO Stale Data: Mitigation: Clear CPU buffers
+[    1.966594][    T0] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    1.972286][    T0] Spectre V2 : WARNING: Unprivileged eBPF is enabled with eIBRS on, data leaks possible via Spectre v2 BHB attacks!
+[    1.976590][    T0] Spectre V2 : Spectre v2 / PBRSB-eIBRS: Retire a single CALL on VMEXIT
+[    1.986590][    T0] Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+[    1.992193][    T0] active return thunk: its_return_thunk
+[    1.995939][    T0] Spectre V2 : Spectre BHI mitigation: SW BHB clearing on syscall and VM exit
+[    1.996755][    T0] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+[    2.006581][    T0] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+[    2.010830][    T0] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+[    2.016581][    T0] x86/fpu: Supporting XSAVE feature 0x008: 'MPX bounds registers'
+[    2.021355][    T0] x86/fpu: Supporting XSAVE feature 0x010: 'MPX CSR'
+[    2.025590][    T0] x86/fpu: Supporting XSAVE feature 0x020: 'AVX-512 opmask'
+[    2.026581][    T0] x86/fpu: Supporting XSAVE feature 0x040: 'AVX-512 Hi256'
+[    2.031003][    T0] x86/fpu: Supporting XSAVE feature 0x080: 'AVX-512 ZMM_Hi256'
+[    2.036581][    T0] x86/fpu: Supporting XSAVE feature 0x200: 'Protection Keys User registers'
+[    2.042003][    T0] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+[    2.046581][    T0] x86/fpu: xstate_offset[3]:  832, xstate_sizes[3]:   64
+[    2.050866][    T0] x86/fpu: xstate_offset[4]:  896, xstate_sizes[4]:   64
+[    2.056581][    T0] x86/fpu: xstate_offset[5]:  960, xstate_sizes[5]:   64
+[    2.060881][    T0] x86/fpu: xstate_offset[6]: 1024, xstate_sizes[6]:  512
+[    2.066581][    T0] x86/fpu: xstate_offset[7]: 1536, xstate_sizes[7]: 1024
+[    2.070875][    T0] x86/fpu: xstate_offset[9]: 2560, xstate_sizes[9]:    8
+[    2.075284][    T0] x86/fpu: Enabled xstate features 0x2ff, context size is 2568 bytes, using 'compacted' format.
+[    2.352923][    T0] Freeing SMP alternatives memory: 132K
+[    2.356378][    T0] pid_max: default: 32768 minimum: 301
+[    2.359567][    T0] landlock: Up and running.
+[    2.362279][    T0] Yama: becoming mindful.
+[    2.366886][    T0] TOMOYO Linux initialized
+[    2.370922][    T0] AppArmor: AppArmor initialized
+[    2.377204][    T0] LSM support for eBPF active
+[    2.384751][    T0] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, vmalloc hugepage)
+[    2.388600][    T0] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, vmalloc hugepage)
+[    2.397339][    T0] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, vmalloc)
+[    2.402588][    T0] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, vmalloc)
+[    2.409921][    T0] VFS: Finished mounting rootfs on nullfs
+[    2.424217][    T0] Running RCU synchronous self tests
+[    2.426586][    T0] Running RCU synchronous self tests
+[    2.431320][    T1] smpboot: CPU0: Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz (family: 0x6, model: 0x55, stepping: 0x7)
+[    2.439695][    T1] Performance Events: Skylake events, 32-deep LBR, full-width counters, Intel PMU driver.
+[    2.446373][    T1] ... version:                   2
+[    2.446592][    T1] ... bit width:                 48
+[    2.449774][    T1] ... generic counters:          4
+[    2.453228][    T1] ... generic bitmap:            000000000000000f
+[    2.456589][    T1] ... fixed-purpose counters:    3
+[    2.459634][    T1] ... fixed-purpose bitmap:      0000000000000007
+[    2.463567][    T1] ... value mask:                0000ffffffffffff
+[    2.466590][    T1] ... max period:                00007fffffffffff
+[    2.470504][    T1] ... global_ctrl mask:          000000070000000f
+[    2.475466][    T1] signal: max sigframe size: 3632
+[    2.477367][    T1] rcu: Hierarchical SRCU implementation.
+[    2.480807][    T1] rcu: 	Max phase no-delay instances is 1000.
+[    2.485933][    T1] Timer migration: 2 hierarchy levels; 8 children per group; 1 crossnode level
+[    2.548430][    T1] smp: Bringing up secondary CPUs ...
+[    2.557661][    T1] smpboot: x86: Booting SMP configuration:
+[    2.561255][    T1] .... node  #1, CPUs:      #1
+[    2.572344][    T1] .... node  #0, CPUs:   #2
+[    2.576660][    T1] .... node  #1, CPUs:   #3
+[    0.152022][    T0] ------------[ cut here ]------------
+[    0.152022][    T0] WARNING: arch/x86/kernel/smpboot.c:698 at set_cpu_sibling_map+0x1205/0x1f10, CPU#1: swapper/1/0
+[    0.152022][    T0] Modules linked in:
+[    0.152022][    T0] CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted 7.0.0-rc7 #7 PREEMPT(full) 
+[    0.152022][    T0] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+[    0.152022][    T0] RIP: 0010:set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0] Code: 7c 08 84 d2 0f 85 d5 0b 00 00 8b 1d 3d 8f 67 0c bf 01 00 00 00 89 de e8 59 68 54 00 83 fb 01 0f 85 4b f3 ff ff e8 cb 6d 54 00 <0f> 0b e9 3f f3 ff ff e8 bf 6d 54 00 48 c7 c3 68 3c b6 93 49 83 fc
+[    0.152022][    T0] RSP: 0000:ffffc9000016fdf8 EFLAGS: 00010093
+[    0.152022][    T0] RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffffff816d57d7
+[    0.152022][    T0] RDX: ffff888100688000 RSI: ffffffff816d57e5 RDI: 0000000000000005
+[    0.152022][    T0] RBP: 0000000000000000 R08: 0000000000000001 R09: fffffbfff27777b4
+[    0.152022][    T0] R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+[    0.152022][    T0] R13: 0000000000000000 R14: 0000000000000001 R15: dffffc0000000000
+[    0.152022][    T0] FS:  0000000000000000(0000) GS:ffff8881a22bd000(0000) knlGS:0000000000000000
+[    0.152022][    T0] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    0.152022][    T0] CR2: 0000000000000000 CR3: 000000000e18c000 CR4: 0000000000750ef0
+[    0.152022][    T0] PKRU: 55555554
+[    0.152022][    T0] Call Trace:
+[    0.152022][    T0]  <TASK>
+[    0.152022][    T0]  ? tsx_dev_mode_disable+0x56/0x1f0
+[    0.152022][    T0]  start_secondary+0xd8/0x2d0
+[    0.152022][    T0]  ? __pfx_start_secondary+0x10/0x10
+[    0.152022][    T0]  common_startup_64+0x13e/0x148
+[    0.152022][    T0]  </TASK>
+[    0.152022][    T0] Kernel panic - not syncing: kernel: panic_on_warn set ...
+[    0.152022][    T0] CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted 7.0.0-rc7 #7 PREEMPT(full) 
+[    0.152022][    T0] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+[    0.152022][    T0] Call Trace:
+[    0.152022][    T0]  <TASK>
+[    0.152022][    T0]  dump_stack_lvl+0x3d/0x1b0
+[    0.152022][    T0]  vpanic+0x7f0/0xa70
+[    0.152022][    T0]  ? __pfx_vpanic+0x10/0x10
+[    0.152022][    T0]  ? is_bpf_text_address+0x96/0x1a0
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0]  panic+0xc2/0xd0
+[    0.152022][    T0]  ? __pfx_panic+0x10/0x10
+[    0.152022][    T0]  ? check_panic_on_warn+0x1f/0xc0
+[    0.152022][    T0]  check_panic_on_warn+0xb1/0xc0
+[    0.152022][    T0]  __warn+0x108/0x420
+[    0.152022][    T0]  __report_bug+0x43a/0x4f0
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0]  ? __pfx___report_bug+0x10/0x10
+[    0.152022][    T0]  ? console_unlock+0x1a9/0x240
+[    0.152022][    T0]  ? __pfx_console_unlock+0x10/0x10
+[    0.152022][    T0]  ? do_raw_spin_unlock+0x147/0x1f0
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0]  report_bug+0xb2/0x210
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0]  handle_bug+0x570/0x5a0
+[    0.152022][    T0]  exc_invalid_op+0x35/0x70
+[    0.152022][    T0]  asm_exc_invalid_op+0x1a/0x20
+[    0.152022][    T0] RIP: 0010:set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0] Code: 7c 08 84 d2 0f 85 d5 0b 00 00 8b 1d 3d 8f 67 0c bf 01 00 00 00 89 de e8 59 68 54 00 83 fb 01 0f 85 4b f3 ff ff e8 cb 6d 54 00 <0f> 0b e9 3f f3 ff ff e8 bf 6d 54 00 48 c7 c3 68 3c b6 93 49 83 fc
+[    0.152022][    T0] RSP: 0000:ffffc9000016fdf8 EFLAGS: 00010093
+[    0.152022][    T0] RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffffff816d57d7
+[    0.152022][    T0] RDX: ffff888100688000 RSI: ffffffff816d57e5 RDI: 0000000000000005
+[    0.152022][    T0] RBP: 0000000000000000 R08: 0000000000000001 R09: fffffbfff27777b4
+[    0.152022][    T0] R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+[    0.152022][    T0] R13: 0000000000000000 R14: 0000000000000001 R15: dffffc0000000000
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x11f7/0x1f10
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0]  ? set_cpu_sibling_map+0x1205/0x1f10
+[    0.152022][    T0]  ? tsx_dev_mode_disable+0x56/0x1f0
+[    0.152022][    T0]  start_secondary+0xd8/0x2d0
+[    0.152022][    T0]  ? __pfx_start_secondary+0x10/0x10
+[    0.152022][    T0]  common_startup_64+0x13e/0x148
+[    0.152022][    T0]  </TASK>
+[    0.152022][    T0] Shutting down cpus with NMI
+[    0.152022][    T0] Rebooting in 86400 seconds..

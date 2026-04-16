@@ -1,0 +1,183 @@
+======================================================
+WARNING: possible circular locking dependency detected
+7.0.0-rc2-g0031c06807cf #3 Tainted: G             L     
+------------------------------------------------------
+syz.2.592/22478 is trying to acquire lock:
+ffff8881154789c0 (&ocfs2_sysfile_lock_key[LOCAL_ALLOC_SYSTEM_INODE]){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:1028 [inline]
+ffff8881154789c0 (&ocfs2_sysfile_lock_key[LOCAL_ALLOC_SYSTEM_INODE]){+.+.}-{4:4}, at: ocfs2_reserve_local_alloc_bits+0xef/0xc10 fs/ocfs2/localalloc.c:636
+
+but task is already holding lock:
+ffff8881298522e0 (&ocfs2_file_ip_alloc_sem_key){++++}-{4:4}, at: __ocfs2_change_file_space+0x588/0x1060 fs/ocfs2/file.c:2022
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #4 (&ocfs2_file_ip_alloc_sem_key){++++}-{4:4}:
+       down_write+0x91/0x200 kernel/locking/rwsem.c:1590
+       ocfs2_try_remove_refcount_tree+0xa5/0x310 fs/ocfs2/refcounttree.c:933
+       ocfs2_xattr_set+0xf08/0x2820 fs/ocfs2/xattr.c:3700
+       ocfs2_set_acl+0x498/0x550 fs/ocfs2/acl.c:255
+       ocfs2_iop_set_acl+0x1d1/0x270 fs/ocfs2/acl.c:287
+       set_posix_acl+0x261/0x330 fs/posix_acl.c:955
+       vfs_set_acl+0x433/0xa30 fs/posix_acl.c:1134
+       do_set_acl+0x148/0x1a0 fs/posix_acl.c:1279
+       do_setxattr+0xdb/0x1d0 fs/xattr.c:633
+       filename_setxattr+0x151/0x1b0 fs/xattr.c:664
+       path_setxattrat+0x1cc/0x2a0 fs/xattr.c:708
+       __do_sys_setxattr fs/xattr.c:742 [inline]
+       __se_sys_setxattr fs/xattr.c:738 [inline]
+       __x64_sys_setxattr+0xc6/0x140 fs/xattr.c:738
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #3 (&oi->ip_xattr_sem){++++}-{4:4}:
+       down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
+       ocfs2_init_acl+0x355/0x840 fs/ocfs2/acl.c:367
+       ocfs2_mknod+0xd6b/0x2650 fs/ocfs2/namei.c:414
+       ocfs2_create+0x180/0x4a0 fs/ocfs2/namei.c:677
+       lookup_open.isra.0+0xc12/0x1030 fs/namei.c:4483
+       open_last_lookups fs/namei.c:4583 [inline]
+       path_openat+0xe97/0x2ce0 fs/namei.c:4827
+       do_file_open+0x216/0x470 fs/namei.c:4859
+       do_sys_openat2+0xe6/0x210 fs/open.c:1366
+       do_sys_open fs/open.c:1372 [inline]
+       __do_sys_creat fs/open.c:1450 [inline]
+       __se_sys_creat fs/open.c:1444 [inline]
+       __x64_sys_creat+0xcc/0x120 fs/open.c:1444
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #2 (&journal->j_trans_barrier){.+.+}-{4:4}:
+       down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
+       ocfs2_start_trans+0x3b6/0x970 fs/ocfs2/journal.c:369
+       ocfs2_update_inode_atime+0xec/0x630 fs/ocfs2/file.c:262
+       ocfs2_inode_lock_atime+0x3a4/0x3c0 fs/ocfs2/dlmglue.c:2607
+       ocfs2_readdir+0x197/0x680 fs/ocfs2/dir.c:1982
+       wrap_directory_iterator+0xa2/0xe0 fs/readdir.c:65
+       iterate_dir+0x2a5/0xb00 fs/readdir.c:108
+       __do_sys_getdents64 fs/readdir.c:412 [inline]
+       __se_sys_getdents64 fs/readdir.c:397 [inline]
+       __x64_sys_getdents64+0x13b/0x2c0 fs/readdir.c:397
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #1 (sb_internal#4){.+.+}-{0:0}:
+       percpu_down_read_internal include/linux/percpu-rwsem.h:53 [inline]
+       percpu_down_read_freezable include/linux/percpu-rwsem.h:83 [inline]
+       __sb_start_write include/linux/fs/super.h:19 [inline]
+       sb_start_intwrite include/linux/fs/super.h:177 [inline]
+       ocfs2_start_trans+0x2a5/0x970 fs/ocfs2/journal.c:367
+       ocfs2_mknod+0xc2d/0x2650 fs/ocfs2/namei.c:365
+       ocfs2_create+0x180/0x4a0 fs/ocfs2/namei.c:677
+       lookup_open.isra.0+0xc12/0x1030 fs/namei.c:4483
+       open_last_lookups fs/namei.c:4583 [inline]
+       path_openat+0xe97/0x2ce0 fs/namei.c:4827
+       do_file_open+0x216/0x470 fs/namei.c:4859
+       do_sys_openat2+0xe6/0x210 fs/open.c:1366
+       do_sys_open fs/open.c:1372 [inline]
+       __do_sys_creat fs/open.c:1450 [inline]
+       __se_sys_creat fs/open.c:1444 [inline]
+       __x64_sys_creat+0xcc/0x120 fs/open.c:1444
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #0 (&ocfs2_sysfile_lock_key[LOCAL_ALLOC_SYSTEM_INODE]){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x1616/0x26b0 kernel/locking/lockdep.c:5237
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x1ba/0x360 kernel/locking/lockdep.c:5825
+       down_write+0x91/0x200 kernel/locking/rwsem.c:1590
+       inode_lock include/linux/fs.h:1028 [inline]
+       ocfs2_reserve_local_alloc_bits+0xef/0xc10 fs/ocfs2/localalloc.c:636
+       ocfs2_reserve_clusters_with_limit+0x76e/0xd80 fs/ocfs2/suballoc.c:1237
+       ocfs2_reserve_clusters fs/ocfs2/suballoc.c:1298 [inline]
+       ocfs2_lock_allocators+0x346/0x610 fs/ocfs2/suballoc.c:3073
+       ocfs2_extend_allocation+0x273/0x17e0 fs/ocfs2/file.c:590
+       ocfs2_allocate_unwritten_extents+0x227/0x730 fs/ocfs2/file.c:1503
+       __ocfs2_change_file_space+0xb54/0x1060 fs/ocfs2/file.c:2030
+       ocfs2_fallocate+0x26d/0x300 fs/ocfs2/file.c:2145
+       vfs_fallocate+0x5d8/0x1030 fs/open.c:340
+       ksys_fallocate fs/open.c:364 [inline]
+       __do_sys_fallocate fs/open.c:369 [inline]
+       __se_sys_fallocate fs/open.c:367 [inline]
+       __x64_sys_fallocate+0xd5/0x150 fs/open.c:367
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+other info that might help us debug this:
+
+Chain exists of:
+  &ocfs2_sysfile_lock_key[LOCAL_ALLOC_SYSTEM_INODE] --> &oi->ip_xattr_sem --> &ocfs2_file_ip_alloc_sem_key
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&ocfs2_file_ip_alloc_sem_key);
+                               lock(&oi->ip_xattr_sem);
+                               lock(&ocfs2_file_ip_alloc_sem_key);
+  lock(&ocfs2_sysfile_lock_key[LOCAL_ALLOC_SYSTEM_INODE]);
+
+ *** DEADLOCK ***
+
+3 locks held by syz.2.592/22478:
+ #0: ffff88812b75c420 (sb_writers#29){.+.+}-{0:0}, at: ksys_fallocate fs/open.c:364 [inline]
+ #0: ffff88812b75c420 (sb_writers#29){.+.+}-{0:0}, at: __do_sys_fallocate fs/open.c:369 [inline]
+ #0: ffff88812b75c420 (sb_writers#29){.+.+}-{0:0}, at: __se_sys_fallocate fs/open.c:367 [inline]
+ #0: ffff88812b75c420 (sb_writers#29){.+.+}-{0:0}, at: __x64_sys_fallocate+0xd5/0x150 fs/open.c:367
+ #1: ffff888129852640 (&sb->s_type->i_mutex_key#41){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:1028 [inline]
+ #1: ffff888129852640 (&sb->s_type->i_mutex_key#41){+.+.}-{4:4}, at: __ocfs2_change_file_space+0x171/0x1060 fs/ocfs2/file.c:1956
+ #2: ffff8881298522e0 (&ocfs2_file_ip_alloc_sem_key){++++}-{4:4}, at: __ocfs2_change_file_space+0x588/0x1060 fs/ocfs2/file.c:2022
+
+stack backtrace:
+CPU: 3 UID: 0 PID: 22478 Comm: syz.2.592 Tainted: G             L      7.0.0-rc2-g0031c06807cf #3 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1b0 lib/dump_stack.c:120
+ print_circular_bug+0x274/0x340 kernel/locking/lockdep.c:2043
+ check_noncircular+0x12d/0x150 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x1616/0x26b0 kernel/locking/lockdep.c:5237
+ lock_acquire kernel/locking/lockdep.c:5868 [inline]
+ lock_acquire+0x1ba/0x360 kernel/locking/lockdep.c:5825
+ down_write+0x91/0x200 kernel/locking/rwsem.c:1590
+ inode_lock include/linux/fs.h:1028 [inline]
+ ocfs2_reserve_local_alloc_bits+0xef/0xc10 fs/ocfs2/localalloc.c:636
+ ocfs2_reserve_clusters_with_limit+0x76e/0xd80 fs/ocfs2/suballoc.c:1237
+ ocfs2_reserve_clusters fs/ocfs2/suballoc.c:1298 [inline]
+ ocfs2_lock_allocators+0x346/0x610 fs/ocfs2/suballoc.c:3073
+ ocfs2_extend_allocation+0x273/0x17e0 fs/ocfs2/file.c:590
+ ocfs2_allocate_unwritten_extents+0x227/0x730 fs/ocfs2/file.c:1503
+ __ocfs2_change_file_space+0xb54/0x1060 fs/ocfs2/file.c:2030
+ ocfs2_fallocate+0x26d/0x300 fs/ocfs2/file.c:2145
+ vfs_fallocate+0x5d8/0x1030 fs/open.c:340
+ ksys_fallocate fs/open.c:364 [inline]
+ __do_sys_fallocate fs/open.c:369 [inline]
+ __se_sys_fallocate fs/open.c:367 [inline]
+ __x64_sys_fallocate+0xd5/0x150 fs/open.c:367
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fa1f0dae16d
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fa1f1cc5f98 EFLAGS: 00000246 ORIG_RAX: 000000000000011d
+RAX: ffffffffffffffda RBX: 00007fa1f0ff5fa0 RCX: 00007fa1f0dae16d
+RDX: 000000000000ffff RSI: 0000000000000000 RDI: 0000000000000004
+RBP: 00007fa1f0e480f0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000100 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fa1f0ff6038 R14: 00007fa1f0ff5fa0 R15: 00007fa1f1ca6000
+ </TASK>

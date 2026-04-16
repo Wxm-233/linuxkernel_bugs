@@ -1,0 +1,102 @@
+clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x21134f58f0d, max_idle_ns: 440795217993 ns
+Calibrating delay loop (skipped) preset value.. 4589.21 BogoMIPS (lpj=22946080)
+x86/cpu: User Mode Instruction Prevention (UMIP) activated
+Last level iTLB entries: 4KB 0, 2MB 0, 4MB 0
+Last level dTLB entries: 4KB 0, 2MB 0, 4MB 0, 1GB 0
+mitigations: Enabled attack vectors: user_kernel, user_user, guest_host, guest_guest, SMT mitigations: auto
+Speculative Store Bypass: Mitigation: Speculative Store Bypass disabled via prctl
+Spectre V2 : Mitigation: Enhanced / Automatic IBRS
+RETBleed: Mitigation: Enhanced IBRS
+ITS: Mitigation: Aligned branch/return thunks
+TAA: Mitigation: Clear CPU buffers
+MMIO Stale Data: Mitigation: Clear CPU buffers
+Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+Spectre V2 : WARNING: Unprivileged eBPF is enabled with eIBRS on, data leaks possible via Spectre v2 BHB attacks!
+Spectre V2 : Spectre v2 / PBRSB-eIBRS: Retire a single CALL on VMEXIT
+Spectre V2 : mitigation: Enabling conditional Indirect Branch Prediction Barrier
+active return thunk: its_return_thunk
+Spectre V2 : Spectre BHI mitigation: SW BHB clearing on syscall and VM exit
+x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
+x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
+x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
+x86/fpu: Supporting XSAVE feature 0x008: 'MPX bounds registers'
+x86/fpu: Supporting XSAVE feature 0x010: 'MPX CSR'
+x86/fpu: Supporting XSAVE feature 0x020: 'AVX-512 opmask'
+x86/fpu: Supporting XSAVE feature 0x040: 'AVX-512 Hi256'
+x86/fpu: Supporting XSAVE feature 0x080: 'AVX-512 ZMM_Hi256'
+x86/fpu: Supporting XSAVE feature 0x200: 'Protection Keys User registers'
+x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
+x86/fpu: xstate_offset[3]:  832, xstate_sizes[3]:   64
+x86/fpu: xstate_offset[4]:  896, xstate_sizes[4]:   64
+x86/fpu: xstate_offset[5]:  960, xstate_sizes[5]:   64
+x86/fpu: xstate_offset[6]: 1024, xstate_sizes[6]:  512
+x86/fpu: xstate_offset[7]: 1536, xstate_sizes[7]: 1024
+x86/fpu: xstate_offset[9]: 2560, xstate_sizes[9]:    8
+x86/fpu: Enabled xstate features 0x2ff, context size is 2568 bytes, using 'compacted' format.
+Freeing SMP alternatives memory: 132K
+pid_max: default: 32768 minimum: 301
+landlock: Up and running.
+Yama: becoming mindful.
+TOMOYO Linux initialized
+AppArmor: AppArmor initialized
+LSM support for eBPF active
+Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, vmalloc hugepage)
+Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, vmalloc hugepage)
+Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, vmalloc)
+Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, vmalloc)
+VFS: Finished mounting rootfs on nullfs
+Running RCU synchronous self tests
+Running RCU synchronous self tests
+------------[ cut here ]------------
+WARNING: arch/x86/kernel/smpboot.c:698 at set_cpu_sibling_map+0x1205/0x1f10 arch/x86/kernel/smpboot.c:698, CPU#1: swapper/1/0
+Modules linked in:
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted 7.0.0-rc7 #7 PREEMPT(full) 
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+RIP: 0010:set_cpu_sibling_map+0x1205/0x1f10 arch/x86/kernel/smpboot.c:698
+Code: 7c 08 84 d2 0f 85 d5 0b 00 00 8b 1d 3d 8f 67 0c bf 01 00 00 00 89 de e8 59 68 54 00 83 fb 01 0f 85 4b f3 ff ff e8 cb 6d 54 00 <0f> 0b e9 3f f3 ff ff e8 bf 6d 54 00 48 c7 c3 68 3c b6 93 49 83 fc
+RSP: 0000:ffffc9000016fdf8 EFLAGS: 00010093
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffffff816d57d7
+RDX: ffff8881000e8000 RSI: ffffffff816d57e5 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000001 R09: fffffbfff27777b4
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8881a22bd000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000000e18c000 CR4: 0000000000750ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ ap_starting arch/x86/kernel/smpboot.c:196 [inline]
+ start_secondary+0xd8/0x2d0 arch/x86/kernel/smpboot.c:280
+ common_startup_64+0x13e/0x148
+ </TASK>
+Kernel panic - not syncing: kernel: panic_on_warn set ...
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted 7.0.0-rc7 #7 PREEMPT(full) 
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x3d/0x1b0 lib/dump_stack.c:120
+ vpanic+0x7f0/0xa70 kernel/panic.c:650
+ panic+0xc2/0xd0 kernel/panic.c:787
+ check_panic_on_warn+0xb1/0xc0 kernel/panic.c:524
+ __warn+0x108/0x420 kernel/panic.c:1062
+ __report_bug+0x43a/0x4f0 lib/bug.c:246
+ report_bug+0xb2/0x210 lib/bug.c:278
+ handle_bug+0x570/0x5a0 arch/x86/kernel/traps.c:435
+ exc_invalid_op+0x35/0x70 arch/x86/kernel/traps.c:489
+ asm_exc_invalid_op+0x1a/0x20 arch/x86/include/asm/idtentry.h:616
+RIP: 0010:set_cpu_sibling_map+0x1205/0x1f10 arch/x86/kernel/smpboot.c:698
+Code: 7c 08 84 d2 0f 85 d5 0b 00 00 8b 1d 3d 8f 67 0c bf 01 00 00 00 89 de e8 59 68 54 00 83 fb 01 0f 85 4b f3 ff ff e8 cb 6d 54 00 <0f> 0b e9 3f f3 ff ff e8 bf 6d 54 00 48 c7 c3 68 3c b6 93 49 83 fc
+RSP: 0000:ffffc9000016fdf8 EFLAGS: 00010093
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffffff816d57d7
+RDX: ffff8881000e8000 RSI: ffffffff816d57e5 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000001 R09: fffffbfff27777b4
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: dffffc0000000000
+ ap_starting arch/x86/kernel/smpboot.c:196 [inline]
+ start_secondary+0xd8/0x2d0 arch/x86/kernel/smpboot.c:280
+ common_startup_64+0x13e/0x148
+ </TASK>
+Shutting down cpus with NMI
+Rebooting in 86400 seconds..

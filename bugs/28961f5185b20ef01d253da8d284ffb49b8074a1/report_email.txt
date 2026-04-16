@@ -1,0 +1,52 @@
+Cc: horms@kernel.org, linux-kernel@vger.kernel.org
+Subject: [BUG] net: caif: potential UAF in cfusbl_device_notify()
+
+Hello,
+
+we hit a KASAN slab-use-after-free read in
+cfusbl_device_notify() under syzkaller-style workloads.
+
+We reproduced this on 7.0.0-rc2-g0031c06807cf.
+
+The crash happens in the NETDEV_REGISTER notifier path:
+
+  bnep_add_connection()
+    -> register_netdev()
+      -> register_netdevice()
+        -> call_netdevice_notifiers(NETDEV_REGISTER, dev)
+          -> cfusbl_device_notify()
+
+The faulting access is the parent/driver-name check in
+net/caif/caif_usb.c:
+
+  if (!(dev->dev.parent && dev->dev.parent->driver &&
+        strcmp(dev->dev.parent->driver->name, "cdc_ncm") == 0))
+          return 0;
+
+From the report, the freed object appears to be the device behind
+dev->dev.parent, not the net_device itself.
+
+My current reading is that this is a cross-subsystem lifetime issue:
+
+- the CAIF USB code registers a global netdevice notifier and
+  inspects every new netdev
+- BNEP sets dev->dev.parent via
+  SET_NETDEV_DEV(dev, bnep_get_device(s))
+- SET_NETDEV_DEV() only stores a raw pointer
+- under concurrent Bluetooth teardown / suspend-related activity,
+  that parent device can be released before cfusbl_device_notify()
+  dereferences dev->dev.parent->driver
+
+So this does not look like a CAIF modem functional regression in
+ordinary use, but it does look like a real UAF in the notifier-side
+filtering logic.
+
+The trigger is clearly fuzzing-oriented and cross-subsystem, so I
+would treat it as low urgency, but it still seems worth fixing in
+net/caif/caif_usb.c, likely by avoiding naked parent dereferences in
+the notifier path or by using a safer or lower-scope identification
+path for relevant devices.
+
+If useful, I can also send the full KASAN report separately.
+
+Thanks.

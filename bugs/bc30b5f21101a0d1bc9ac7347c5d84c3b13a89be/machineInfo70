@@ -1,0 +1,115 @@
+QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.28)
+qemu-system-x86_64 ["-m" "4096" "-smp" "4" "-chardev" "socket,id=SOCKSYZ,server=on,wait=off,host=localhost,port=36961" "-mon" "chardev=SOCKSYZ,mode=control" "-display" "none" "-serial" "stdio" "-no-reboot" "-name" "VM-8" "-device" "virtio-rng-pci" "-enable-kvm" "-cpu" "host,migratable=off" "-device" "e1000,netdev=net0" "-netdev" "user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:20249-:22" "-hda" "/home/jiakai/vini/image-repo/images-66/bullseye.img" "-snapshot" "-kernel" "/home/jiakai/vini/linux-repo/mainline/arch/x86/boot/bzImage" "-append" "root=/dev/sda console=ttyS0 "]
+
+[CPU Info]
+processor           : 0, 1, 2, 3
+vendor_id           : GenuineIntel
+cpu family          : 6
+model               : 85
+model name          : Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
+stepping            : 7
+microcode           : 0x5003901
+cpu MHz             : 2294.608
+cache size          : 16384 KB
+physical id         : 0
+siblings            : 4
+core id             : 0, 1, 2, 3
+cpu cores           : 4
+apicid              : 0, 1, 2, 3
+initial apicid      : 0, 1, 2, 3
+fpu                 : yes
+fpu_exception       : yes
+cpuid level         : 22
+wp                  : yes
+flags               : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq vmx ssse3 fma cx16 pdcm sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm mpx avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves arat vnmi umip pku ospke avx512_vnni md_clear flush_l1d arch_capabilities
+vmx flags           : vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid shadow_vmcs pml tsc_scaling
+bugs                : spectre_v1 spectre_v2 spec_store_bypass swapgs taa mmio_stale_data retbleed eibrs_pbrsb bhi ibpb_no_ret spectre_v2_user its
+bogomips            : 4589.21
+clflush size        : 64
+cache_alignment     : 64
+address sizes       : 46 bits physical, 48 bits virtual
+power management    : 
+
+--------------------------------------------------------------------------------
+
+[KVM]
+/sys/module/kvm:
+	nx_huge_pages_recovery_period_ms: 0
+	eager_page_split: Y
+	halt_poll_ns: 200000
+	halt_poll_ns_shrink: 2
+	flush_on_reuse: N
+	allow_unsafe_mappings: N
+	mmio_caching: Y
+	enable_vmware_backdoor: N
+	enable_pmu: Y
+	tdp_mmu: Y
+	vector_hashing: Y
+	halt_poll_ns_grow: 2
+	force_emulation_prefix: 0
+	report_ignored_msrs: Y
+	enable_virt_at_load: Y
+	nx_huge_pages_recovery_ratio: 60
+	pi_inject_timer: 0
+	tsc_tolerance_ppm: 250
+	min_timer_period_us: 200
+	lapic_timer_advance: Y
+	nx_huge_pages: N
+	halt_poll_ns_grow_start: 10000
+	mitigate_smt_rsb: N
+	ignore_msrs: N
+
+/sys/module/kvm_intel:
+	sgx: N
+	warn_on_missed_cc: N
+	ple_gap: 0
+	dump_invalid_vmcs: N
+	unrestricted_guest: Y
+	enable_device_posted_irqs: N
+	ple_window_shrink: 0
+	eptad: Y
+	vnmi: Y
+	flexpriority: Y
+	ple_window: 0
+	enable_ipiv: N
+	enable_mediated_pmu: N
+	allow_smaller_maxphyaddr: N
+	nested: Y
+	vpid: Y
+	error_on_inconsistent_vmcs_config: Y
+	ple_window_grow: 0
+	ept: Y
+	fasteoi: Y
+	enable_apicv: Y
+	pml: Y
+	preemption_timer: Y
+	enable_shadow_vmcs: Y
+	vmentry_l1d_flush: not required
+	ple_window_max: 0
+	emulate_invalid_guest_state: Y
+
+/sys/module/kvm_amd:
+	lbrv: 1
+	pause_filter_count_grow: 2
+	intercept_smi: Y
+	enable_mediated_pmu: N
+	vnmi: Y
+	force_avic: N
+	pause_filter_count_shrink: 0
+	npt: Y
+	nrips: 1
+	nested: 1
+	dump_invalid_vmcb: N
+	vls: 1
+	enable_ipiv: N
+	pause_filter_count: 3000
+	tsc_scaling: 1
+	pause_filter_count_max: 65535
+	pause_filter_thresh: 128
+	avic: Y
+	enable_device_posted_irqs: N
+	vgif: 1
+
+
+--------------------------------------------------------------------------------
+

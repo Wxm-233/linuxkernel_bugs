@@ -1,0 +1,218 @@
+==================================================================
+BUG: KASAN: slab-use-after-free in cfusbl_device_notify+0x897/0x930 net/caif/caif_usb.c:142
+Read of size 8 at addr ffff8881142fcd48 by task syz.1.4728/61581
+
+CPU: 1 UID: 0 PID: 61581 Comm: syz.1.4728 Tainted: G             L      7.0.0-rc2-g0031c06807cf #3 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1b0 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x5f0 mm/kasan/report.c:482
+ kasan_report+0xca/0x100 mm/kasan/report.c:595
+ cfusbl_device_notify+0x897/0x930 net/caif/caif_usb.c:142
+ notifier_call_chain+0xb2/0x450 kernel/notifier.c:85
+ call_netdevice_notifiers_info+0xbe/0x110 net/core/dev.c:2249
+ call_netdevice_notifiers_extack net/core/dev.c:2287 [inline]
+ call_netdevice_notifiers net/core/dev.c:2301 [inline]
+ register_netdevice+0x14b6/0x2130 net/core/dev.c:11480
+ register_netdev+0x36/0x60 net/core/dev.c:11538
+ bnep_add_connection+0x705/0xd30 net/bluetooth/bnep/core.c:624
+ do_bnep_sock_ioctl.constprop.0+0x440/0x540 net/bluetooth/bnep/sock.c:83
+ sock_do_ioctl+0xdc/0x260 net/socket.c:1254
+ sock_ioctl+0x239/0x6a0 net/socket.c:1375
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7f533a7ae16d
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f533b605f98 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f533a9f5fa0 RCX: 00007f533a7ae16d
+RDX: 0000200000000200 RSI: 00000000400442c8 RDI: 0000000000000004
+RBP: 00007f533a8480f0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f533a9f6038 R14: 00007f533a9f5fa0 R15: 00007f533b5e6000
+ </TASK>
+
+Allocated by task 9851:
+ kasan_save_stack+0x24/0x50 mm/kasan/common.c:57
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:415
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ kzalloc_noprof include/linux/slab.h:1188 [inline]
+ __hci_conn_add+0xff/0x1e60 net/bluetooth/hci_conn.c:963
+ hci_conn_add_unset+0x76/0x130 net/bluetooth/hci_conn.c:1090
+ hci_conn_request_evt+0x9df/0xb30 net/bluetooth/hci_event.c:3324
+ hci_event_func net/bluetooth/hci_event.c:7784 [inline]
+ hci_event_packet+0xa71/0x11e0 net/bluetooth/hci_event.c:7838
+ hci_rx_work+0x6b9/0x1020 net/bluetooth/hci_core.c:4077
+ process_one_work+0x990/0x1bd0 kernel/workqueue.c:3275
+ process_scheduled_works kernel/workqueue.c:3358 [inline]
+ worker_thread+0x67e/0xe90 kernel/workqueue.c:3439
+ kthread+0x403/0x530 kernel/kthread.c:467
+ ret_from_fork+0xb27/0xdd0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Freed by task 61581:
+ kasan_save_stack+0x24/0x50 mm/kasan/common.c:57
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:78
+ kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x61/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2692 [inline]
+ slab_free mm/slub.c:6143 [inline]
+ kfree+0x2ec/0x6d0 mm/slub.c:6461
+ device_release+0xa6/0x240 drivers/base/core.c:2565
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1ba/0x590 lib/kobject.c:737
+ put_device drivers/base/core.c:3797 [inline]
+ device_add+0x3f7/0x1930 drivers/base/core.c:3742
+ netdev_register_kobject+0x1a9/0x3e0 net/core/net-sysfs.c:2358
+ register_netdevice+0x1434/0x2130 net/core/dev.c:11422
+ register_netdev+0x36/0x60 net/core/dev.c:11538
+ bnep_add_connection+0x705/0xd30 net/bluetooth/bnep/core.c:624
+ do_bnep_sock_ioctl.constprop.0+0x440/0x540 net/bluetooth/bnep/sock.c:83
+ sock_do_ioctl+0xdc/0x260 net/socket.c:1254
+ sock_ioctl+0x239/0x6a0 net/socket.c:1375
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Last potentially related work creation:
+ kasan_save_stack+0x24/0x50 mm/kasan/common.c:57
+ kasan_record_aux_stack+0xa7/0xc0 mm/kasan/generic.c:556
+ insert_work+0x36/0x230 kernel/workqueue.c:2199
+ __queue_work+0x988/0x1050 kernel/workqueue.c:2354
+ __queue_delayed_work+0x35d/0x450 kernel/workqueue.c:2522
+ queue_delayed_work_on+0x12c/0x140 kernel/workqueue.c:2574
+ queue_delayed_work include/linux/workqueue.h:684 [inline]
+ hci_conn_drop include/net/bluetooth/hci_core.h:1712 [inline]
+ hci_conn_drop include/net/bluetooth/hci_core.h:1686 [inline]
+ l2cap_chan_del+0x59e/0x940 net/bluetooth/l2cap_core.c:672
+ l2cap_conn_del+0x390/0x780 net/bluetooth/l2cap_core.c:1782
+ l2cap_connect_cfm+0x604/0x1000 net/bluetooth/l2cap_core.c:7323
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2139 [inline]
+ hci_conn_failed+0x1bf/0x360 net/bluetooth/hci_conn.c:1342
+ hci_abort_conn_sync+0x755/0xb00 net/bluetooth/hci_sync.c:5753
+ hci_disconnect_all_sync.constprop.0+0x104/0x3d0 net/bluetooth/hci_sync.c:5776
+ hci_suspend_sync+0x616/0xb40 net/bluetooth/hci_sync.c:6252
+ hci_suspend_dev+0x330/0x560 net/bluetooth/hci_core.c:2850
+ hci_suspend_notifier+0x2e4/0x350 net/bluetooth/hci_core.c:2421
+ notifier_call_chain+0xb2/0x450 kernel/notifier.c:85
+ notifier_call_chain_robust kernel/notifier.c:120 [inline]
+ blocking_notifier_call_chain_robust kernel/notifier.c:345 [inline]
+ blocking_notifier_call_chain_robust+0xc7/0x160 kernel/notifier.c:333
+ pm_notifier_call_chain_robust+0x2a/0x60 kernel/power/main.c:172
+ snapshot_open+0x18e/0x2b0 kernel/power/user.c:77
+ misc_open+0x266/0x440 drivers/char/misc.c:163
+ chrdev_open+0x236/0x730 fs/char_dev.c:411
+ do_dentry_open+0x6a8/0x1680 fs/open.c:949
+ vfs_open+0x82/0x3f0 fs/open.c:1081
+ do_open fs/namei.c:4671 [inline]
+ path_openat+0x1fc1/0x2ce0 fs/namei.c:4830
+ do_file_open+0x216/0x470 fs/namei.c:4859
+ do_sys_openat2+0xe6/0x210 fs/open.c:1366
+ do_sys_open fs/open.c:1372 [inline]
+ __do_sys_openat fs/open.c:1388 [inline]
+ __se_sys_openat fs/open.c:1383 [inline]
+ __x64_sys_openat+0x13f/0x1f0 fs/open.c:1383
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+The buggy address belongs to the object at ffff8881142fc000
+ which belongs to the cache kmalloc-8k of size 8192
+The buggy address is located 3400 bytes inside of
+ freed 8192-byte region [ffff8881142fc000, ffff8881142fe000)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1142f8
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x57ff00000000040(head|node=1|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 057ff00000000040 ffff88801b443180 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000800020002 00000000f5000000 0000000000000000
+head: 057ff00000000040 ffff88801b443180 dead000000000100 dead000000000122
+head: 0000000000000000 0000000800020002 00000000f5000000 0000000000000000
+head: 057ff00000000003 ffffea000450be01 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 13015, tgid 13015 (kworker/3:3), ts 747667979740, free_ts 747593562893
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x134/0x160 mm/page_alloc.c:1889
+ prep_new_page mm/page_alloc.c:1897 [inline]
+ get_page_from_freelist+0xde8/0x2ad0 mm/page_alloc.c:3962
+ __alloc_frozen_pages_noprof+0x217/0x3a0 mm/page_alloc.c:5250
+ alloc_slab_page mm/slub.c:3269 [inline]
+ allocate_slab+0x7e/0x670 mm/slub.c:3458
+ refill_objects+0x256/0x3f0 mm/slub.c:7153
+ refill_sheaf mm/slub.c:2818 [inline]
+ __pcs_replace_empty_main+0x1af/0x620 mm/slub.c:4592
+ alloc_from_pcs mm/slub.c:4695 [inline]
+ slab_alloc_node mm/slub.c:4829 [inline]
+ __do_kmalloc_node mm/slub.c:5237 [inline]
+ __kmalloc_noprof+0x7d1/0x950 mm/slub.c:5250
+ kmalloc_noprof include/linux/slab.h:954 [inline]
+ kzalloc_noprof include/linux/slab.h:1188 [inline]
+ usb_get_configuration+0x12b/0x5780 drivers/usb/core/config.c:936
+ usb_enumerate_device drivers/usb/core/hub.c:2527 [inline]
+ usb_new_device+0x13f8/0x1ac0 drivers/usb/core/hub.c:2665
+ hub_port_connect drivers/usb/core/hub.c:5567 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5707 [inline]
+ port_event drivers/usb/core/hub.c:5871 [inline]
+ hub_event+0x2efa/0x5020 drivers/usb/core/hub.c:5953
+ process_one_work+0x990/0x1bd0 kernel/workqueue.c:3275
+ process_scheduled_works kernel/workqueue.c:3358 [inline]
+ worker_thread+0x67e/0xe90 kernel/workqueue.c:3439
+ kthread+0x403/0x530 kernel/kthread.c:467
+ ret_from_fork+0xb27/0xdd0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+page last free pid 56062 tgid 56061 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1433 [inline]
+ __free_frozen_pages+0x7f9/0x10d0 mm/page_alloc.c:2978
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x4e/0xf0 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x195/0x1e0 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x67/0x90 mm/kasan/common.c:350
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4515 [inline]
+ slab_alloc_node mm/slub.c:4844 [inline]
+ __kmalloc_cache_noprof+0x260/0x840 mm/slub.c:5353
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ kzalloc_noprof include/linux/slab.h:1188 [inline]
+ kobject_uevent_env+0x236/0x17b0 lib/kobject_uevent.c:540
+ loop_configure+0xe3a/0x15d0 drivers/block/loop.c:1092
+ lo_ioctl+0x68a/0x1d10 drivers/block/loop.c:1534
+ blkdev_ioctl+0x366/0x6c0 block/ioctl.c:804
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc6/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Memory state around the buggy address:
+ ffff8881142fcc00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8881142fcc80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff8881142fcd00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                              ^
+ ffff8881142fcd80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8881142fce00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================

@@ -1,0 +1,74 @@
+------------[ cut here ]------------
+BTRFS: Transaction aborted (error -2)
+WARNING: fs/btrfs/extent-tree.c:3105 at do_free_extent_accounting fs/btrfs/extent-tree.c:3105 [inline], CPU#3: syz-executor/9839
+WARNING: fs/btrfs/extent-tree.c:3105 at __btrfs_free_extent.isra.0+0x2df5/0x4ca0 fs/btrfs/extent-tree.c:3474, CPU#3: syz-executor/9839
+Modules linked in:
+CPU: 3 UID: 0 PID: 9839 Comm: syz-executor Not tainted 7.0.0-rc1-00286-gaed968f8a6cd #2 PREEMPT(full) 
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+RIP: 0010:do_free_extent_accounting fs/btrfs/extent-tree.c:3105 [inline]
+RIP: 0010:__btrfs_free_extent.isra.0+0x2df7/0x4ca0 fs/btrfs/extent-tree.c:3474
+Code: e8 ae 18 db fd 8d 45 1e 83 f8 19 77 0f ba 01 00 04 02 48 0f a3 c2 0f 82 b1 0a 00 00 e8 b2 1d db fd 48 8d 3d db c0 ae 0c 89 ee <67> 48 0f b9 3a bb 01 00 00 00 e8 9a 1d db fd 48 8b 7c 24 20 41 89
+RSP: 0018:ffffc900145a7760 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff83e65f62
+RDX: ffff888101284a80 RSI: 00000000fffffffe RDI: ffffffff90952060
+RBP: 00000000fffffffe R08: 0000000000000001 R09: ffffed10233f0b8e
+R10: fffffffffffffffe R11: 0000000000000005 R12: ffff88812f9e3580
+R13: ffff888119f85c00 R14: 000000000051b000 R15: 0000000000000000
+FS:  00005555669a4500(0000) GS:ffff8881a23c9000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005620ea87cb48 CR3: 0000000119e75000 CR4: 0000000000752ef0
+PKRU: 80000000
+Call Trace:
+ <TASK>
+ run_delayed_data_ref fs/btrfs/extent-tree.c:1623 [inline]
+ run_one_delayed_ref fs/btrfs/extent-tree.c:1807 [inline]
+ btrfs_run_delayed_refs_for_head fs/btrfs/extent-tree.c:2003 [inline]
+ __btrfs_run_delayed_refs+0x8f8/0x4230 fs/btrfs/extent-tree.c:2078
+ btrfs_run_delayed_refs+0x1ad/0x4c0 fs/btrfs/extent-tree.c:2190
+ btrfs_commit_transaction+0x1f82/0x46a0 fs/btrfs/transaction.c:2238
+ btrfs_sync_fs+0x132/0x7c0 fs/btrfs/super.c:1051
+ sync_filesystem fs/sync.c:66 [inline]
+ sync_filesystem+0x1d6/0x2a0 fs/sync.c:30
+ generic_shutdown_super+0x86/0x3d0 fs/super.c:625
+ kill_anon_super+0x3a/0x60 fs/super.c:1292
+ btrfs_kill_super+0x3c/0x50 fs/btrfs/super.c:2127
+ deactivate_locked_super+0xbf/0x1a0 fs/super.c:476
+ deactivate_super fs/super.c:509 [inline]
+ deactivate_super+0xb1/0xd0 fs/super.c:505
+ cleanup_mnt+0x2df/0x430 fs/namespace.c:1312
+ task_work_run+0x16b/0x260 kernel/task_work.c:233
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ __exit_to_user_mode_loop kernel/entry/common.c:67 [inline]
+ exit_to_user_mode_loop+0x115/0x510 kernel/entry/common.c:98
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
+ syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:325 [inline]
+ do_syscall_64+0x63c/0xf80 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fe1a1dafb8b
+Code: a8 ff ff ff f7 d8 64 89 01 48 83 c8 ff c3 90 f3 0f 1e fa 31 f6 e9 05 00 00 00 0f 1f 44 00 00 f3 0f 1e fa b8 a6 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 05 c3 0f 1f 40 00 48 c7 c2 a8 ff ff ff f7 d8
+RSP: 002b:00007ffe87fa2d68 EFLAGS: 00000246 ORIG_RAX: 00000000000000a6
+RAX: 0000000000000000 RBX: 0000000000000035 RCX: 00007fe1a1dafb8b
+RDX: 00007fe1a1c4fd10 RSI: 0000000000000009 RDI: 00007ffe87fa2e20
+RBP: 00007ffe87fa2e20 R08: 0000000000000000 R09: 00007ffe87fa2bf0
+R10: 00005555669b7673 R11: 0000000000000246 R12: 00007fe1a1e47cae
+R13: 00007ffe87fa3ef0 R14: 00005555669b7600 R15: 0000000000023a1c
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	e8 ae 18 db fd       	call   0xfddb18b3
+   5:	8d 45 1e             	lea    0x1e(%rbp),%eax
+   8:	83 f8 19             	cmp    $0x19,%eax
+   b:	77 0f                	ja     0x1c
+   d:	ba 01 00 04 02       	mov    $0x2040001,%edx
+  12:	48 0f a3 c2          	bt     %rax,%rdx
+  16:	0f 82 b1 0a 00 00    	jb     0xacd
+  1c:	e8 b2 1d db fd       	call   0xfddb1dd3
+  21:	48 8d 3d db c0 ae 0c 	lea    0xcaec0db(%rip),%rdi        # 0xcaec103
+  28:	89 ee                	mov    %ebp,%esi
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	bb 01 00 00 00       	mov    $0x1,%ebx
+  34:	e8 9a 1d db fd       	call   0xfddb1dd3
+  39:	48 8b 7c 24 20       	mov    0x20(%rsp),%rdi
+  3e:	41                   	rex.B
+  3f:	89                   	.byte 0x89

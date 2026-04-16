@@ -1,0 +1,74 @@
+Suggested subject:
+[REPORT] x86/topology: warning in set_cpu_sibling_map() with numa=fake=2 on non-NUMA x86 guest
+
+Recipients from get_maintainer.pl
+Command used:
+& 'C:\Program Files\Git\usr\bin\perl.exe' scripts\get_maintainer.pl --nogit --email --m --l --n -f arch/x86/kernel/smpboot.c
+& 'C:\Program Files\Git\usr\bin\perl.exe' scripts\get_maintainer.pl --nogit --email --m --l --n -f arch/x86/mm/numa.c -f mm/numa_emulation.c
+
+Suggested To:
+Thomas Gleixner <tglx@kernel.org>
+Ingo Molnar <mingo@redhat.com>
+Borislav Petkov <bp@alien8.de>
+Dave Hansen <dave.hansen@linux.intel.com>
+x86@kernel.org
+Andrew Morton <akpm@linux-foundation.org>
+Mike Rapoport <rppt@kernel.org>
+
+Suggested Cc:
+Andy Lutomirski <luto@kernel.org>
+Peter Zijlstra <peterz@infradead.org>
+"H. Peter Anvin" <hpa@zytor.com>
+linux-kernel@vger.kernel.org
+linux-mm@kvack.org
+
+Mail body draft:
+
+Hello,
+
+We reproduced this under syzkaller-style workloads.
+
+The issue is a boot-time warning in set_cpu_sibling_map() on x86 while booting a non-NUMA KVM guest with numa=fake=2.
+
+The warning looks reproducible and seems to come from an interaction between x86 topology validation and NUMA emulation, rather than from a real hardware topology inconsistency.
+
+Environment:
+- machine: QEMU/KVM guest
+- CPU topology from boot log:
+  Max. logical packages: 1
+  Num. nodes per package: 1
+  Max. threads per core: 1
+  Num. cores per package: 4
+- relevant cmdline fragment:
+  numa=fake=2 panic_on_warn=1
+
+Observed warning:
+WARNING: arch/x86/kernel/smpboot.c:698 at set_cpu_sibling_map+0x1205/0x1f10
+CPU: 1 PID: 0 Comm: swapper/1
+RIP: set_cpu_sibling_map+0x1205/0x1f10 arch/x86/kernel/smpboot.c:698
+Call Trace:
+ ap_starting arch/x86/kernel/smpboot.c:196 [inline]
+ start_secondary+0xd8/0x2d0 arch/x86/kernel/smpboot.c:280
+ common_startup_64+0x13e/0x148
+
+At the same time, the log shows that NUMA was emulated:
+Faking node 0 at ...
+Faking node 1 at ...
+
+My reading of the code is:
+1. set_cpu_sibling_map() builds SMT/LLC/L2/die relationships and calls topology_sane() before accepting some of those relationships.
+2. topology_sane() warns if two topology-related CPUs are not on the same NUMA node.
+3. In the NUMA emulation / fake node case, the CPU-to-node mapping can be rewritten in terms of emulated node IDs, even when the underlying CPU/package topology is still a single physical node.
+4. That can make CPUs from the same package / cache domain appear to be on different emulated nodes, which then triggers the warning.
+
+So this looks less like a real topology bug and more like an over-strict warning under numa=fake= / NUMA emulation.
+
+Would it make sense to suppress or relax this warning for NUMA emulation, instead of treating it as a real topology inconsistency?
+
+If useful, I can also turn this into a small patch once the preferred direction is clear.
+
+Thanks.
+
+Notes:
+- If you want to make the report more conservative, replace "over-strict warning" with "possibly unexpected warning under NUMA emulation".
+- If you later decide to send a patch, the likely target is to avoid warning in topology_sane() or its callers when the mismatch is caused by emulated NUMA rather than physical topology.
