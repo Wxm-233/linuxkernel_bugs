@@ -1,0 +1,64 @@
+Cc: gregkh@linuxfoundation.org, brauner@kernel.org, linux-kernel@vger.kernel.org
+Subject: [BUG] mac80211: lockdep warning from key debugfs creation
+
+Hello,
+
+We hit a lockdep warning in the mac80211 key-add path under
+syzkaller-style workloads.
+
+We reproduced this on 6.19.0-rc5-00042-g944aacb68baf. In the same bug
+bucket, later runs still show the same warning on
+7.0.0-rc2-g0031c06807cf.
+
+The warning is:
+
+  WARNING: possible circular locking dependency detected
+
+The observed path is:
+
+  nl80211_new_key()
+    -> rdev_add_key()
+    -> ieee80211_add_key()
+    -> ieee80211_key_link()
+    -> ieee80211_debugfs_key_add()
+    -> debugfs_create_dir()
+    -> start_dirop()
+
+nl80211_pre_doit() keeps wiphy.mtx held across nl80211_new_key().
+After ieee80211_key_replace() succeeds, ieee80211_key_link()
+immediately creates per-key debugfs entries.
+
+That debugfs_create_dir() call goes through debugfs_start_creating(),
+simple_start_creating(), and start_dirop(). start_dirop() takes the
+parent inode rwsem and lookup_one_qstr_excl() then allocates a dentry
+with GFP_KERNEL, which introduces fs_reclaim into the lock chain.
+
+The warning becomes possible because there is already an existing
+dependency from relay_open_buf()/relay_create_buf_file(): that path
+holds relay_channels_mutex and then enters the same debugfs/VFS
+creation flow, which reaches the directory inode lock.
+
+With both chains present, lockdep reports the cycle:
+
+  fs_reclaim -> relay_channels_mutex -> inode rwsem -> fs_reclaim
+
+This looks more like a real locking problem than a pure fuzzing
+artifact. The trigger is a syzkaller-style key creation workload, but
+the questionable part is that mac80211 performs non-essential debugfs
+creation inside the locked key installation path.
+
+A possible fix direction would be to avoid creating per-key debugfs
+entries while still in the locked add-key path, for example by
+deferring the debugfs population until after the critical section or by
+moving it to a safer asynchronous context.
+
+Relevant source locations in current trees are:
+
+  net/wireless/nl80211.c: nl80211_pre_doit(), nl80211_new_key()
+  net/mac80211/key.c: ieee80211_key_link()
+  net/mac80211/debugfs_key.c: ieee80211_debugfs_key_add()
+  fs/namei.c: start_dirop()
+
+If useful, I can also send the full report/log pair.
+
+Thanks,
