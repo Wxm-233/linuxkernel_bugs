@@ -1,0 +1,46 @@
+gfs2: fsid=syz:syz.0: jid=0, already locked for use
+gfs2: fsid=syz:syz.0: jid=0: Looking at journal...
+------------[ cut here ]------------
+kernel BUG at block/bio.c:341!
+Oops: invalid opcode: 0000 [#1] SMP NOPTI
+CPU: 0 UID: 0 PID: 1197 Comm: kworker/0:2 Not tainted 6.18.5 #1 PREEMPT(full) 
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: gfs2_recovery gfs2_recover_func
+RIP: 0010:bio_chain+0x49/0x60 home/zzzrrll/tmp/linux/block/bio.c:341
+Code: 2b e8 1b 86 d2 fe 4c 89 73 40 48 c7 43 38 90 40 93 82 41 80 4e 14 08 f0 41 ff 46 1c 5b 41 5e e9 a8 00 7d fe e8 f8 85 d2 fe 90 <0f> 0b e8 f0 85 d2 fe 90 0f 0b 66 66 66 66 2e 0f 1f 84 00 00 00 00
+RSP: 0018:ffa0000002733b20 EFLAGS: 00010293
+RAX: ffffffff82934068 RBX: ff11000033557d00 RCX: ff1100000c189800
+RDX: 0000000000000000 RSI: ff11000033557700 RDI: ff11000033557d00
+RBP: 00000000000001ec R08: ffffffff8298dbdc R09: 000000000000000a
+R10: ffffffff81000230 R11: ffffffff815c75f0 R12: ffd4000000a056c0
+R13: 0000000000000000 R14: ff11000033557700 R15: 0000000000000800
+FS:  0000000000000000(0000) GS:ff110000f4370000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6513fde000 CR3: 0000000018331000 CR4: 0000000000751ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ gfs2_chain_bio home/zzzrrll/tmp/linux/fs/gfs2/lops.c:490 [inline]
+ gfs2_find_jhead+0x4a8/0x6f0 home/zzzrrll/tmp/linux/fs/gfs2/lops.c:552
+ gfs2_recover_func+0x3a5/0x1110 home/zzzrrll/tmp/linux/fs/gfs2/recovery.c:457
+ process_one_work home/zzzrrll/tmp/linux/kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0x2ec/0x6c0 home/zzzrrll/tmp/linux/kernel/workqueue.c:3346
+ worker_thread+0x30c/0x470 home/zzzrrll/tmp/linux/kernel/workqueue.c:3427
+ kthread+0x357/0x3e0 home/zzzrrll/tmp/linux/kernel/kthread.c:463
+ ret_from_fork+0x170/0x220 home/zzzrrll/tmp/linux/arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 home/zzzrrll/tmp/linux/arch/x86/entry/entry_64.S:245
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bio_chain+0x49/0x60 home/zzzrrll/tmp/linux/block/bio.c:341
+Code: 2b e8 1b 86 d2 fe 4c 89 73 40 48 c7 43 38 90 40 93 82 41 80 4e 14 08 f0 41 ff 46 1c 5b 41 5e e9 a8 00 7d fe e8 f8 85 d2 fe 90 <0f> 0b e8 f0 85 d2 fe 90 0f 0b 66 66 66 66 2e 0f 1f 84 00 00 00 00
+RSP: 0018:ffa0000002733b20 EFLAGS: 00010293
+RAX: ffffffff82934068 RBX: ff11000033557d00 RCX: ff1100000c189800
+RDX: 0000000000000000 RSI: ff11000033557700 RDI: ff11000033557d00
+RBP: 00000000000001ec R08: ffffffff8298dbdc R09: 000000000000000a
+R10: ffffffff81000230 R11: ffffffff815c75f0 R12: ffd4000000a056c0
+R13: 0000000000000000 R14: ff11000033557700 R15: 0000000000000800
+FS:  0000000000000000(0000) GS:ff110000f4370000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f65150be000 CR3: 0000000027fe8000 CR4: 0000000000751ef0
+PKRU: 55555554

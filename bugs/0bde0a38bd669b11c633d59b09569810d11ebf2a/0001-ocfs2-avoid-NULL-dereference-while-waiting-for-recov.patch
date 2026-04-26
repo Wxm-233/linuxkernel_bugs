@@ -1,0 +1,109 @@
+From c2ec3fc1bd6930d2b18e28d4203de0fe3ea9241b Mon Sep 17 00:00:00 2001
+From: Wxm-233 <2200013188@stu.pku.edu.cn>
+Date: Mon, 27 Apr 2026 05:45:56 +0800
+Subject: [PATCH] ocfs2: avoid NULL dereference while waiting for recovery
+
+syzkaller-style workloads can reach ocfs2_inode_lock_full_nested() while
+an OCFS2 mount is being torn down after a mount failure or during
+teardown. In that case ocfs2_wait_for_recovery() can still evaluate the
+recovery wait condition after recovery_map has been withdrawn, leading
+to a NULL pointer dereference in ocfs2_recovery_completed().
+
+Teach ocfs2_wait_for_recovery() to stop waiting when the volume is
+being disabled or dismounted, and propagate the failure back to the
+metadata lock path instead of continuing after recovery state has gone
+away.
+
+This change is based on the observed crash path and is intended as a
+best-effort fix for the teardown race; it may still need follow-up if a
+broader lifetime issue turns up.
+
+Signed-off-by: Wxm-233 <2200013188@stu.pku.edu.cn>
+---
+ fs/ocfs2/dlmglue.c | 14 ++++++++++----
+ fs/ocfs2/journal.c | 22 ++++++++++++++++++++--
+ fs/ocfs2/journal.h |  2 +-
+ 3 files changed, 31 insertions(+), 7 deletions(-)
+
+diff --git a/fs/ocfs2/dlmglue.c b/fs/ocfs2/dlmglue.c
+index bd2ddb7..0ae1d4b 100644
+--- a/fs/ocfs2/dlmglue.c
++++ b/fs/ocfs2/dlmglue.c
+@@ -2453,8 +2453,11 @@ int ocfs2_inode_lock_full_nested(struct inode *inode,
+ 	    ocfs2_mount_local(osb))
+ 		goto update;
+ 
+-	if (!(arg_flags & OCFS2_META_LOCK_RECOVERY))
+-		ocfs2_wait_for_recovery(osb);
++	if (!(arg_flags & OCFS2_META_LOCK_RECOVERY)) {
++		status = ocfs2_wait_for_recovery(osb);
++		if (status < 0)
++			goto bail;
++	}
+ 
+ 	lockres = &OCFS2_I(inode)->ip_inode_lockres;
+ 	level = ex ? DLM_LOCK_EX : DLM_LOCK_PR;
+@@ -2477,8 +2480,11 @@ int ocfs2_inode_lock_full_nested(struct inode *inode,
+ 	 * the lower dlm layers. The second time though, we've
+ 	 * committed to owning this lock so we don't allow signals to
+ 	 * abort the operation. */
+-	if (!(arg_flags & OCFS2_META_LOCK_RECOVERY))
+-		ocfs2_wait_for_recovery(osb);
++	if (!(arg_flags & OCFS2_META_LOCK_RECOVERY)) {
++		status = ocfs2_wait_for_recovery(osb);
++		if (status < 0)
++			goto bail;
++	}
+ 
+ update:
+ 	/*
+diff --git a/fs/ocfs2/journal.c b/fs/ocfs2/journal.c
+index 4c86a9d..e0625aa 100644
+--- a/fs/ocfs2/journal.c
++++ b/fs/ocfs2/journal.c
+@@ -1227,9 +1227,27 @@ static int ocfs2_recovery_completed(struct ocfs2_super *osb)
+ 	return empty;
+ }
+ 
+-void ocfs2_wait_for_recovery(struct ocfs2_super *osb)
++int ocfs2_wait_for_recovery(struct ocfs2_super *osb)
+ {
+-	wait_event(osb->recovery_event, ocfs2_recovery_completed(osb));
++	int status;
++
++	status = ocfs2_wait_on_mount(osb);
++	if (status < 0)
++		return status;
++
++	wait_event(osb->recovery_event,
++		   atomic_read(&osb->vol_state) >= VOLUME_DISMOUNTED ||
++		   !READ_ONCE(osb->recovery_map) ||
++		   ocfs2_recovery_completed(osb));
++
++	status = ocfs2_wait_on_mount(osb);
++	if (status < 0)
++		return status;
++
++	if (!READ_ONCE(osb->recovery_map))
++		return -EIO;
++
++	return 0;
+ }
+ 
+ /*
+diff --git a/fs/ocfs2/journal.h b/fs/ocfs2/journal.h
+index 6397170..64a8e88 100644
+--- a/fs/ocfs2/journal.h
++++ b/fs/ocfs2/journal.h
+@@ -144,7 +144,7 @@ void ocfs2_orphan_scan_start(struct ocfs2_super *osb);
+ void ocfs2_orphan_scan_stop(struct ocfs2_super *osb);
+ 
+ void ocfs2_complete_recovery(struct work_struct *work);
+-void ocfs2_wait_for_recovery(struct ocfs2_super *osb);
++int ocfs2_wait_for_recovery(struct ocfs2_super *osb);
+ 
+ int ocfs2_recovery_init(struct ocfs2_super *osb);
+ void ocfs2_recovery_exit(struct ocfs2_super *osb);
+-- 
+2.45.2.windows.1
+

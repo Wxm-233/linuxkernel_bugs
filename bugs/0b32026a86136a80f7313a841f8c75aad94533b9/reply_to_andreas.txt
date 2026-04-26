@@ -1,0 +1,39 @@
+Cc: gfs2@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] gfs2: keep per-bio end_io when splitting journal head reads
+
+Hi Andreas,
+
+Thanks for pointing me to commit 469d71512d13 ("Revert "gfs2: Fix use
+of bio_chain"").
+
+I had missed that revert. After looking at it again, I agree that my
+patch direction was wrong, so I will drop that patch.
+
+What I can say about the trigger so far is:
+
+- we reproduced this on 6.18.5
+- the report came from a syzkaller-style fuzzing run
+- the crash happens during GFS2 journal recovery, not on a normal data
+  path
+- the stack is:
+
+    gfs2_recover_func()
+      -> gfs2_find_jhead()
+      -> gfs2_chain_bio()
+      -> bio_chain()
+
+From the code path, it appears to happen during journal head lookup
+when the read enters the split-bio case in gfs2_find_jhead().
+
+However, I do not yet have a minimized standalone reproducer that I am
+confident is correct. The "last executing programs" section in the log
+does not isolate the responsible operation reliably enough, so at the
+moment I can only describe it as being triggered by mounting a crafted
+GFS2 image generated during fuzzing, which then enters journal
+recovery and hits this path.
+
+I will go back and try to extract a concrete reproducer / test case
+before following up further.
+
+Thanks,
+Wxm-233

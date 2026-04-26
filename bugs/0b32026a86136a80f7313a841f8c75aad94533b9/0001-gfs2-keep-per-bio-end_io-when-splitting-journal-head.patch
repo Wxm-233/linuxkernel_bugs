@@ -1,0 +1,49 @@
+From 7550d2a5d755fdf9dd10bcffff9fa2c9cc4c015f Mon Sep 17 00:00:00 2001
+From: Wxm-233 <2200013188@stu.pku.edu.cn>
+Date: Fri, 24 Apr 2026 11:12:20 +0800
+Subject: [PATCH] gfs2: keep per-bio end_io when splitting journal head reads
+
+gfs2_find_jhead() can split a folio across two bios when part of the
+folio is already queued in the current bio and the remaining blocks
+need a new bio.
+
+That split path currently calls bio_chain(new, prev).  But journal read
+bios need to retain gfs2_end_log_read() and bi_private so that each bio
+completes its own folios with folio_end_read().  Replacing the new
+bio's completion handler with the block layer chaining callback breaks
+that expectation, and fuzzing workloads can hit a BUG in bio_chain()
+on this path.
+
+Keep the per-bio completion state for the new bio and only submit the
+previous bio.
+
+Signed-off-by: Wxm-233 <2200013188@stu.pku.edu.cn>
+---
+ fs/gfs2/lops.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/fs/gfs2/lops.c b/fs/gfs2/lops.c
+index 6586963..3d0fad3 100644
+--- a/fs/gfs2/lops.c
++++ b/fs/gfs2/lops.c
+@@ -481,12 +481,16 @@ static void gfs2_jhead_process_page(struct gfs2_jdesc *jd, unsigned long index,
+ static struct bio *gfs2_chain_bio(struct bio *prev, unsigned int nr_iovecs,
+ 				  sector_t sector, blk_opf_t opf)
+ {
++	bio_end_io_t *end_io = prev->bi_end_io;
++	void *private = prev->bi_private;
+ 	struct bio *new;
+ 
+ 	new = bio_alloc(prev->bi_bdev, nr_iovecs, opf, GFP_NOIO);
+ 	bio_clone_blkg_association(new, prev);
+ 	new->bi_iter.bi_sector = sector;
+-	bio_chain(new, prev);
++	/* Each journal read bio must complete its own folios. */
++	new->bi_end_io = end_io;
++	new->bi_private = private;
+ 	submit_bio(prev);
+ 	return new;
+ }
+-- 
+2.45.2.windows.1
+

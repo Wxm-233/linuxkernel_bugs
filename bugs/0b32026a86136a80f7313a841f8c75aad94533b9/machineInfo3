@@ -1,0 +1,114 @@
+QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.30)
+qemu-system-x86_64 ["-m" "4096" "-smp" "2" "-chardev" "socket,id=SOCKSYZ,server=on,wait=off,host=localhost,port=15414" "-mon" "chardev=SOCKSYZ,mode=control" "-display" "none" "-serial" "stdio" "-no-reboot" "-name" "VM-0" "-device" "virtio-rng-pci" "-enable-kvm" "-cpu" "host,migratable=off" "-device" "e1000,netdev=net0" "-netdev" "user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:40739-:22" "-hda" "/home/zzzrrll/syz-workdir-basic/bullseye.img" "-snapshot" "-kernel" "/home/zzzrrll/tmp/linux_bc/arch/x86/boot/bzImage" "-append" "root=/dev/sda console=ttyS0 "]
+
+[CPU Info]
+processor           : 0, 1
+vendor_id           : AuthenticAMD
+cpu family          : 25
+model               : 160
+model name          : AMD EPYC 9754 128-Core Processor
+stepping            : 2
+microcode           : 0xaa00219
+cpu MHz             : 2250.000
+cache size          : 512 KB
+physical id         : 0
+siblings            : 2
+core id             : 0, 1
+cpu cores           : 2
+apicid              : 0, 1
+initial apicid      : 0, 1
+fpu                 : yes
+fpu_exception       : yes
+cpuid level         : 16
+wp                  : yes
+flags               : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid extd_apicid tsc_known_freq pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy svm cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw perfctr_core ssbd ibrs ibpb stibp vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx512_bf16 clzero xsaveerptr wbnoinvd arat npt nrip_save avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid fsrm arch_capabilities
+bugs                : sysret_ss_attrs null_seg spectre_v1 spectre_v2 spec_store_bypass srso ibpb_no_ret spectre_v2_user tsa
+bogomips            : 4500.00
+TLB size            : 1024 4K pages
+clflush size        : 64
+cache_alignment     : 64
+address sizes       : 52 bits physical, 57 bits virtual
+power management    : 
+
+--------------------------------------------------------------------------------
+
+[KVM]
+/sys/module/kvm:
+	halt_poll_ns: 200000
+	enable_virt_at_load: Y
+	nx_huge_pages_recovery_ratio: 60
+	tdp_mmu: Y
+	lapic_timer_advance: Y
+	force_emulation_prefix: 0
+	kvmclock_periodic_sync: Y
+	nx_huge_pages: N
+	enable_vmware_backdoor: N
+	nx_huge_pages_recovery_period_ms: 0
+	pi_inject_timer: 0
+	tsc_tolerance_ppm: 250
+	flush_on_reuse: N
+	halt_poll_ns_grow_start: 10000
+	ignore_msrs: N
+	vector_hashing: Y
+	mmio_caching: N
+	report_ignored_msrs: Y
+	mitigate_smt_rsb: N
+	halt_poll_ns_shrink: 2
+	allow_unsafe_mappings: N
+	eager_page_split: Y
+	halt_poll_ns_grow: 2
+	min_timer_period_us: 200
+	enable_pmu: Y
+
+/sys/module/kvm_intel:
+	enable_ipiv: N
+	ept: Y
+	ple_window_max: 4294967295
+	error_on_inconsistent_vmcs_config: Y
+	nested: Y
+	preemption_timer: Y
+	unrestricted_guest: Y
+	nested_early_check: N
+	ple_window: 4096
+	fasteoi: Y
+	enable_apicv: N
+	vnmi: Y
+	dump_invalid_vmcs: N
+	eptad: Y
+	flexpriority: Y
+	ple_gap: 128
+	emulate_invalid_guest_state: Y
+	vpid: Y
+	enable_device_posted_irqs: N
+	enable_shadow_vmcs: Y
+	ple_window_grow: 2
+	vmentry_l1d_flush: auto
+	pml: Y
+	ple_window_shrink: 0
+	sgx: Y
+	allow_smaller_maxphyaddr: N
+
+/sys/module/kvm_amd:
+	nested: 1
+	pause_filter_thresh: 0
+	enable_device_posted_irqs: N
+	pause_filter_count_grow: 2
+	pause_filter_count_shrink: 0
+	vgif: 0
+	lbrv: 0
+	nrips: 1
+	npt: Y
+	enable_ipiv: N
+	intercept_smi: Y
+	force_avic: N
+	vls: 0
+	dump_invalid_vmcb: N
+	pause_filter_count: 0
+	pause_filter_count_max: 65535
+	vnmi: N
+	tsc_scaling: 0
+	avic: N
+
+
+--------------------------------------------------------------------------------
+
